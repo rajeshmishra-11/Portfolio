@@ -189,13 +189,19 @@ export default function Achievements() {
 
             {/* Document / Image Viewer */}
             <div className="achievement-modal__viewer">
-              {selected.image?.endsWith('.pdf') ? (
-                <iframe
-                  src={`${selected.image}#toolbar=0&navpanes=0&scrollbar=1&view=FitH&zoom=page-width`}
-                  title={selected.title}
-                  className="achievement-modal__pdf"
-                />
-              ) : (
+              {selected.image?.endsWith('.pdf') ? (() => {
+                const isMobile = navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(navigator.userAgent)
+                const pdfUrl = isMobile
+                  ? `https://docs.google.com/viewer?url=${encodeURIComponent(window.location.origin + selected.image)}&embedded=true`
+                  : `${selected.image}#toolbar=0&navpanes=0&scrollbar=1&view=FitH&zoom=page-width`
+                return (
+                  <iframe
+                    src={pdfUrl}
+                    title={selected.title}
+                    className="achievement-modal__pdf"
+                  />
+                )
+              })() : (
                 <img
                   src={selected.image}
                   alt={selected.title}

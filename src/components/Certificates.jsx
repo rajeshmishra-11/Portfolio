@@ -131,13 +131,19 @@ export default function Certificates() {
 
             {/* Certificate Viewer */}
             <div className="cert-modal__viewer">
-              {selected.type === 'pdf' ? (
-                <iframe
-                  src={`${selected.file}#view=FitH`}
-                  title={selected.title}
-                  className="cert-modal__iframe"
-                />
-              ) : (
+              {selected.type === 'pdf' ? (() => {
+                const isMobile = navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(navigator.userAgent)
+                const pdfUrl = isMobile
+                  ? `https://docs.google.com/viewer?url=${encodeURIComponent(window.location.origin + selected.file)}&embedded=true`
+                  : `${selected.file}#view=FitH`
+                return (
+                  <iframe
+                    src={pdfUrl}
+                    title={selected.title}
+                    className="cert-modal__iframe"
+                  />
+                )
+              })() : (
                 <img
                   src={selected.file}
                   alt={selected.title}

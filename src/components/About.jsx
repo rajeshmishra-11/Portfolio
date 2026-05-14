@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { Link } from 'react-scroll'
 import { FiCode, FiAward, FiBook, FiUsers } from 'react-icons/fi'
 import './About.css'
 
 const stats = [
-  { icon: <FiCode />, value: 6, label: 'Projects Built', suffix: '' },
-  { icon: <FiAward />, value: 4, label: 'Certificates', suffix: '' },
-  { icon: <FiBook />, value: 3, label: 'Years Learning', suffix: '' },
-  { icon: <FiUsers />, value: 2, label: 'Team Projects', suffix: '' },
+  { icon: <FiCode />, value: 6, label: 'Projects Built', suffix: '', to: 'projects' },
+  { icon: <FiAward />, value: 4, label: 'Certificates', suffix: '', to: 'certificates' },
+  { icon: <FiBook />, value: 3, label: 'Years Learning', suffix: '', to: 'skills' },
+  { icon: <FiUsers />, value: 2, label: 'Team Projects', suffix: '', to: 'projects' },
 ]
 
 function AnimatedCounter({ value, suffix }) {
@@ -95,7 +96,7 @@ export default function About() {
               I am passionate about creating efficient and scalable solutions while continuously
               improving my technical skills through real-world projects and collaborative learning.
               Currently in my 4th year of B.Sc AI Honours at Central Tribal University of
-              Andhra Pradesh (CGPA: 7.9), with leadership experience through Campus Mantri at CampusKarma.
+              Andhra Pradesh (CGPA: 7.9), with leadership experience through Campus Mantri at GeeksforGeeks.
             </p>
             <div className="about__tags">
               {['Python', 'Flask', 'React', 'MySQL', 'JavaScript', 'Bootstrap', 'Problem Solver', 'Team Player'].map(t => (
@@ -112,13 +113,22 @@ export default function About() {
 
         <div className="about__stats">
           {stats.map((s, i) => (
-            <div key={i} className="about__stat glass-card">
+            <Link
+              key={i}
+              to={s.to}
+              smooth
+              duration={600}
+              offset={-80}
+              className="about__stat glass-card about__stat--clickable"
+              title={`Go to ${s.label}`}
+            >
               <div className="about__stat-icon">{s.icon}</div>
               <div className="about__stat-value">
                 <AnimatedCounter value={s.value} suffix={s.suffix} />
               </div>
               <p className="about__stat-label">{s.label}</p>
-            </div>
+              <span className="about__stat-arrow">↗</span>
+            </Link>
           ))}
         </div>
       </div>

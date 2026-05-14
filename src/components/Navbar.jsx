@@ -59,20 +59,14 @@ export default function Navbar() {
         </ul>
 
         <div className="navbar__right">
-          {/* Theme Toggle */}
+          {/* Theme Toggle — shows Moon in light mode, Sun in dark mode */}
           <button
             className="navbar__theme-toggle"
             onClick={toggle}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            <span className={`navbar__theme-icon ${theme === 'dark' ? 'active' : ''}`}>
-              <FiMoon size={16} />
-            </span>
-            <span className="navbar__theme-knob" />
-            <span className={`navbar__theme-icon ${theme === 'light' ? 'active' : ''}`}>
-              <FiSun size={16} />
-            </span>
+            {theme === 'light' ? <FiMoon size={20} /> : <FiSun size={20} />}
           </button>
 
           <button className="navbar__toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">

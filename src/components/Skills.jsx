@@ -5,26 +5,15 @@ import './Skills.css'
 
 // Only skills from the resume — Python is strongest
 const skillBars = [
-  { name: 'Python', level: 90 },
-  { name: 'C / C++', level: 72 },
-  { name: 'JavaScript', level: 75 },
-  { name: 'HTML / CSS', level: 82 },
-  { name: 'React.js', level: 78 },
-  { name: 'MySQL / SQL', level: 80 },
+  { name: 'Python',       icon: <SiPython />,     color: '#3776ab', level: 90 },
+  { name: 'C / C++',     icon: <FiCode />,       color: '#00599c', level: 72 },
+  { name: 'JavaScript',  icon: <SiJavascript />, color: '#f7df1e', level: 75 },
+  { name: 'HTML / CSS',  icon: <SiHtml5 />,      color: '#e34f26', level: 82 },
+  { name: 'React.js',   icon: <SiReact />,      color: '#61dafb', level: 78 },
+  { name: 'MySQL / SQL', icon: <SiMysql />,      color: '#00758f', level: 80 },
 ]
 
 const techCategories = [
-  {
-    label: 'Languages',
-    color: '#7c3aed',
-    items: [
-      { icon: <SiPython />, name: 'Python', color: '#3776ab' },
-      { icon: <FiCode />, name: 'C / C++', color: '#00599c' },
-      { icon: <SiJavascript />, name: 'JavaScript', color: '#f7df1e' },
-      { icon: <SiHtml5 />, name: 'HTML5', color: '#e34f26' },
-      { icon: <SiCss />, name: 'CSS3', color: '#1572b6' },
-    ],
-  },
   {
     label: 'Frameworks',
     color: '#06b6d4',
@@ -45,16 +34,8 @@ const techCategories = [
       { icon: <SiDocker />, name: 'Docker', color: '#2496ed' },
       { icon: <SiGit />, name: 'Git', color: '#f05032' },
       { icon: <SiPostman />, name: 'Postman', color: '#ff6c37' },
-    ],
-  },
-  {
-    label: 'Database & Other',
-    color: '#22c55e',
-    items: [
       { icon: <SiMysql />, name: 'MySQL', color: '#00758f' },
-      { icon: <FiDatabase />, name: 'SQL', color: '#06b6d4' },
       { icon: <FiCloud />, name: 'Render', color: '#46e3b7' },
-      { icon: <FiCode />, name: 'Agile / SDLC', color: '#94a3b8' },
     ],
   },
 ]
@@ -91,13 +72,14 @@ export default function Skills() {
           <div className="skills__bars glass-card">
             <h3 className="skills__subtitle">
               <span className="skills__subtitle-dot" style={{ background: '#7c3aed' }} />
-              Proficiency
+              Language Proficiency
             </h3>
             <div className="skills__bar-list">
               {skillBars.map((s) => (
                 <div key={s.name} className="skill-bar">
                   <div className="skill-bar__header">
                     <span className="skill-bar__name">
+                      <span className="skill-bar__lang-icon" style={{ color: s.color }}>{s.icon}</span>
                       {s.name}
                       {s.name === 'Python' && <span className="skill-bar__badge">★ Strongest</span>}
                     </span>

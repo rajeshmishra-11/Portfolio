@@ -21,6 +21,27 @@ const experience = [
   },
 ]
 
+// Mobile browsers (Android/iOS) cannot render PDFs natively in iframes —
+// they show a download/open prompt instead of the actual content.
+// Google Docs Viewer converts the PDF to renderable HTML on-the-fly,
+// so the resume appears visually on phones just like on desktop.
+function getPdfSrc(fullscreen = false) {
+  const isMobile =
+    typeof navigator !== 'undefined' &&
+    (navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(navigator.userAgent))
+
+  const absoluteUrl = `${window.location.origin}/resume.pdf`
+
+  if (isMobile) {
+    return `https://docs.google.com/viewer?url=${encodeURIComponent(absoluteUrl)}&embedded=true`
+  }
+
+  // Desktop — native browser PDF rendering
+  return fullscreen
+    ? '/resume.pdf#toolbar=1&view=FitH&zoom=page-width'
+    : '/resume.pdf#toolbar=0&view=FitH'
+}
+
 export default function Resume() {
   const [fullscreen, setFullscreen] = useState(false)
 
@@ -29,7 +50,6 @@ export default function Resume() {
       const res = await fetch('/resume.pdf')
       if (!res.ok) throw new Error('fetch failed')
       const blob = await res.blob()
-      // Use octet-stream to force download instead of browser PDF preview
       const forceBlob = new Blob([blob], { type: 'application/octet-stream' })
       const url = URL.createObjectURL(forceBlob)
       const a = document.createElement('a')
@@ -108,7 +128,7 @@ export default function Resume() {
 
             <div className="resume__pdf-embed-wrap glass-card">
               <iframe
-                src="/resume.pdf#view=FitH"
+                src={getPdfSrc(false)}
                 title="Rajesh Mishra Resume"
                 className="resume__pdf-iframe"
               />
@@ -124,7 +144,11 @@ export default function Resume() {
             <div className="resume__fullscreen-header">
               <span className="resume__fullscreen-title">Rajesh Mishra — Resume</span>
               <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => window.open('/resume.pdf', '_blank')} className="btn btn-primary" style={{ padding: '8px 18px', fontSize: '0.85rem' }}>
+                <button
+                  onClick={() => window.open('/resume.pdf', '_blank')}
+                  className="btn btn-primary"
+                  style={{ padding: '8px 18px', fontSize: '0.85rem' }}
+                >
                   <FiDownload size={15} /> Download
                 </button>
                 <button className="resume__fullscreen-close" onClick={() => setFullscreen(false)}>
@@ -133,7 +157,7 @@ export default function Resume() {
               </div>
             </div>
             <iframe
-              src="/resume.pdf#view=FitH"
+              src={getPdfSrc(true)}
               title="Resume Fullscreen"
               className="resume__fullscreen-iframe"
             />

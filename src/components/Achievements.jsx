@@ -19,29 +19,17 @@ const achievements = [
     id: 2,
     icon: <FiTrendingUp />,
     color: '#06b6d4',
-    title: 'Learning Record — GeeksforGeeks',
+    title: 'Letter of Recommendation',
     org: 'GeeksforGeeks',
-    year: '2026',
-    desc: 'Solved 300+ coding problems on GeeksforGeeks, consistently ranked among active learners. Strong focus on Data Structures, Algorithms, and Python programming.',
+    year: 'Jan 2026 – June 2026',
+    desc: 'Received a Letter of Recommendation from GeeksforGeeks for exceptional contribution as a Campus Mantri (Jan 2026 – June 2026), recognized for leadership, event coordination, and promoting technical learning initiatives on campus.',
     image: '/achievements/lro-gfg.png',
     hasProof: true,
     proofLabel: 'View Record',
-    link: 'https://www.geeksforgeeks.org/profile/rajeshmishhica',
+    link: 'https://www.geeksforgeeks.org/profile/rajeshmishhica?tab=activity',
   },
   {
     id: 3,
-    icon: <FiCode />,
-    color: '#f59e0b',
-    title: 'Smart Study System — Minor Project',
-    org: 'Academic Project',
-    year: '2026',
-    desc: 'Led full-stack development of an AI-assisted study system for tribal students, praised by faculty for its real-world social impact.',
-    image: null,
-    hasProof: false,
-    proofLabel: null,
-  },
-  {
-    id: 4,
     icon: <FiStar />,
     color: '#22c55e',
     title: '5+ Projects Completed',
@@ -52,19 +40,33 @@ const achievements = [
     hasProof: false,
     proofLabel: null,
     link: 'https://github.com/rajeshmishra-11',
+    linkLabel: 'GitHub Profile',
   },
   {
-    id: 5,
+    id: 4,
     icon: <FiZap />,
     color: '#f89820',
     title: '300+ Problems Solved',
     org: 'GeeksforGeeks / LeetCode',
-    year: '2024–26',
+    year: '2025–26',
     desc: 'Solved 300+ coding problems on GeeksforGeeks and LeetCode, continuously strengthening Data Structures and Algorithm skills in Python.',
     image: null,
     hasProof: false,
     proofLabel: null,
-    link: 'https://www.geeksforgeeks.org/profile/rajeshmishhica',
+    link: 'https://www.geeksforgeeks.org/profile/rajeshmishhica?tab=activity',
+    linkLabel: 'GFG Profile',
+  },
+  {
+    id: 5,
+    icon: <FiStar />,
+    color: '#e11d48',
+    title: 'Selected as Finalist — IIITM Gwalior',
+    org: 'IIITM Gwalior',
+    year: '2026',
+    desc: 'Selected as a Finalist at IIITM Gwalior — recognized for exceptional performance and innovation in a competitive technical event at one of India\'s premier technical institutes.',
+    image: '/certificates/iiitm_gwalior.jpg',
+    hasProof: true,
+    proofLabel: 'View Certificate',
   },
   {
     id: 6,
@@ -128,8 +130,15 @@ export default function Achievements() {
                 </div>
               )}
               {a.link && !a.hasProof && (
-                <a href={a.link} target="_blank" rel="noreferrer" className="achievement-card__view-hint" style={{ color: a.color, zIndex: 10, position: 'relative' }} onClick={(e) => e.stopPropagation()}>
-                  View Profile →
+                <a
+                  href={a.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="achievement-card__link-btn"
+                  style={{ color: a.color, borderColor: `${a.color}55`, background: `${a.color}12` }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {a.linkLabel || 'View Profile'} ↗
                 </a>
               )}
             </div>
@@ -182,9 +191,9 @@ export default function Achievements() {
             <div className="achievement-modal__viewer">
               {selected.image?.endsWith('.pdf') ? (
                 <iframe
-                  src={`${selected.image}#view=FitH`}
+                  src={`${selected.image}#toolbar=0&navpanes=0&scrollbar=1&view=FitH&zoom=page-width`}
                   title={selected.title}
-                  style={{ width: '100%', height: '100%', border: 'none', borderRadius: 'var(--radius-sm)' }}
+                  className="achievement-modal__pdf"
                 />
               ) : (
                 <img

@@ -70,7 +70,7 @@
 .hero__social:hover { color: var(--primary-light); border-color: var(--primary); transform: translateY(-3px); background: rgba(20,184,166,0.1); }
 
 .hero__scroll-hint {
-  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   font-size: 0.78rem; color: var(--text-muted); cursor: pointer;
   animation: bounce 2s ease infinite 1s;

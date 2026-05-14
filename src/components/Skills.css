@@ -28,6 +28,10 @@
   font-size: 0.9rem; font-weight: 600; color: var(--text-primary);
   display: flex; align-items: center; gap: 8px;
 }
+.skill-bar__lang-icon {
+  font-size: 1.1rem; display: flex; align-items: center; flex-shrink: 0;
+  filter: drop-shadow(0 0 4px currentColor);
+}
 .skill-bar__badge {
   font-size: 0.68rem; font-weight: 700;
   background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.2));
@@ -68,7 +72,7 @@
 /* ===== TECH CATEGORIES ===== */
 .skills__categories {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 .skills__category { padding: 24px; }

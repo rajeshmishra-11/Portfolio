@@ -115,7 +115,7 @@ export default function Projects() {
               <div className="project-card__links">
                 {p.github && (
                   <a href={p.github} target="_blank" rel="noreferrer" className="project-card__link">
-                    <FiGithub size={16} /> Code
+                    <FiGithub size={16} /> Link
                   </a>
                 )}
                 {p.live && (

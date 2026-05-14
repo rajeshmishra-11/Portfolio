@@ -140,6 +140,6 @@
 
 @media (max-width: 768px) {
   .resume__timeline { grid-template-columns: 1fr; }
-  .resume__pdf-embed-wrap { height: 500px; }
+  .resume__pdf-embed-wrap { height: 75vh; }
   .resume__fullscreen-modal { max-width: 100%; height: 95vh; }
 }

@@ -66,7 +66,7 @@ const projects = [
       'Deployed on GitHub Pages with Vite optimized production build',
     ],
     tags: ['React', 'Vite', 'CSS', 'EmailJS', 'GitHub Pages'],
-    github: 'https://github.com/rajeshmishra-11',
+    github: 'https://github.com/rajeshmishra-11/Portfolio',
     live: null,
     featured: false,
     color: '#22c55e',

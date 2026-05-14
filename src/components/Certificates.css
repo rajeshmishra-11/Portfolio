@@ -158,6 +158,8 @@
 
 @media (max-width: 700px) {
   .certificates__grid { grid-template-columns: 1fr; }
-  .cert-modal__viewer { min-height: 350px; }
-  .cert-modal__iframe { min-height: 350px; }
+  .cert-modal { max-width: 100%; max-height: 95vh; }
+  .cert-modal__viewer { min-height: auto; aspect-ratio: 1 / 1.1; }
+  .cert-modal__iframe { min-height: auto; height: 100%; }
+  .cert-modal__img { min-height: auto; max-height: 50vh; }
 }

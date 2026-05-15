@@ -9,9 +9,9 @@ import './Contact.css'
 // 2. Add a Gmail service → copy the Service ID below
 // 3. Create an email template with variables: {{from_name}}, {{from_email}}, {{subject}}, {{message}}
 // 4. Copy the Template ID and your Public Key below
-const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID'   // e.g. 'service_abc123'
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'  // e.g. 'template_xyz789'
-const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY'   // e.g. 'aBcDeFgHiJkLmNoP'
+const EMAILJS_SERVICE_ID  = 'service_cgib4l9'   // e.g. 'service_abc123'
+const EMAILJS_TEMPLATE_ID = 'template_pagtfio'  // e.g. 'template_xyz789'
+const EMAILJS_PUBLIC_KEY  = 'guWeB6jgS0ZEeOksC'   // e.g. 'aBcDeFgHiJkLmNoP'
 // ──────────────────────────────────────────────────────────────────────────
 
 const contactInfo = [
@@ -41,18 +41,7 @@ export default function Contact() {
       EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID' ||
       EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY'
     ) {
-      // Fallback: open Gmail compose with the message pre-filled
-      const subject = encodeURIComponent(form.subject || 'Portfolio Contact')
-      const body = encodeURIComponent(
-        `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
-      )
-      window.open(
-        `https://mail.google.com/mail/?view=cm&to=rajeshmishra847410@gmail.com&su=${subject}&body=${body}`,
-        '_blank'
-      )
-      setStatus('success')
-      setTimeout(() => { setStatus('idle'); setForm(EMPTY) }, 4000)
-      return
+      // EmailJS will handle sending the message. No client-side fallback needed.
     }
 
     try {

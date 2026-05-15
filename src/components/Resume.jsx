@@ -15,9 +15,9 @@ const experience = [
     type: 'education',
     icon: <FiBook />,
     title: 'Class 12th — MPC (Math, Physics, Chemistry)',
-    org: 'Atal Aadarsh Vidyalay, Lodi Estate, Delhi — CBSE Board',
+    org: 'Atal Aadarsh Vidyalaya, Lodi Estate, Delhi — CBSE Board',
     period: '2022 – 2023',
-    desc: 'Completed higher secondary education with Mathematics, Physics, and Chemistry as core subjects from Atal Aadarsh Vidyalay under CBSE Board. Scored 70% marks.',
+    desc: 'Completed higher secondary education with Mathematics, Physics, and Chemistry as core subjects from Atal Aadarsh Vidyalaya under CBSE Board. Scored 70% marks.',
   },
 ]
 

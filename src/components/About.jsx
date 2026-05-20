@@ -104,8 +104,8 @@ export default function About() {
               ))}
             </div>
             <div className="about__actions">
-              <button onClick={() => window.open('/resume.pdf', '_blank')} className="btn btn-primary">
-                View / Download Resume
+              <button onClick={handleDownload} className="btn btn-primary">
+                Download Resume
               </button>
             </div>
           </div>

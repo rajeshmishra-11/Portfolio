@@ -117,9 +117,9 @@ export default function Resume() {
                   <FiExternalLink size={16} />
                 </a>
                 <button
-                  onClick={() => window.open('/resume.pdf', '_blank')}
+                  onClick={handleDownload}
                   className="resume__pdf-btn resume__pdf-btn--primary"
-                  title="Download / View"
+                  title="Download Resume"
                 >
                   <FiDownload size={16} /> Download
                 </button>
@@ -145,7 +145,7 @@ export default function Resume() {
               <span className="resume__fullscreen-title">Rajesh Mishra — Resume</span>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button
-                  onClick={() => window.open('/resume.pdf', '_blank')}
+                  onClick={handleDownload}
                   className="btn btn-primary"
                   style={{ padding: '8px 18px', fontSize: '0.85rem' }}
                 >

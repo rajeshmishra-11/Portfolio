@@ -1,12 +1,7 @@
+import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import About from './components/About'
-import Skills from './components/Skills'
-import Projects from './components/Projects'
-import Certificates from './components/Certificates'
-import Achievements from './components/Achievements'
-import Resume from './components/Resume'
-import Contact from './components/Contact'
+import PortfolioPage from './components/PortfolioPage'
+import AdminDashboard from './components/AdminDashboard'
 import Footer from './components/Footer'
 import { ThemeProvider } from './ThemeContext'
 import './App.css'
@@ -14,20 +9,18 @@ import './App.css'
 function App() {
   return (
     <ThemeProvider>
-      <div className="app">
-        <Navbar />
-        <main>
-          <Hero />
-          <About />
-          <Skills />
-          <Projects />
-          <Certificates />
-          <Achievements />
-          <Resume />
-          <Contact />
-        </main>
-        <Footer />
-      </div>
+      <Router>
+        <div className="app">
+          <Navbar />
+          <main>
+            <Routes>
+              <Route path="/" element={<PortfolioPage />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
     </ThemeProvider>
   )
 }

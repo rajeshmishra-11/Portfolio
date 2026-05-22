@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FiX, FiAward, FiCalendar, FiDownload, FiExternalLink, FiMaximize2 } from 'react-icons/fi'
+import { fetchPortfolioData } from '../portfolioApi'
 import './Certificates.css'
 
 // Your real certificates
-const certificates = [
+const staticCertificates = [
   {
     id: 1,
     title: 'Software Engineer Intern',
@@ -46,8 +47,32 @@ const certificates = [
   },
 ]
 
+const COLORS = ['#7c3aed', '#00758f', '#f59e0b', '#06b6d4', '#22c55e', '#e11d48']
+
 export default function Certificates() {
+  const [list, setList] = useState(staticCertificates)
   const [selected, setSelected] = useState(null)
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchPortfolioData()
+      if (data && data.certificates && data.certificates.length > 0) {
+        const processed = data.certificates.map((c, i) => {
+          const file = c.file || c.image || ''
+          return {
+            ...c,
+            color: (c.color && c.color !== '#06b6d4') ? c.color : COLORS[i % COLORS.length],
+            file: file,
+            type: c.type || (file.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image'),
+            description: c.description || `Certificate from ${c.issuer}`
+          }
+        })
+        setList(processed)
+      }
+    }
+    load()
+  }, [])
+
 
   return (
     <section id="certificates" className="section certificates">
@@ -59,7 +84,7 @@ export default function Certificates() {
         </div>
 
         <div className="certificates__grid">
-          {certificates.map((cert) => (
+          {list.map((cert) => (
             <div
               key={cert.id}
               className="cert-card glass-card"

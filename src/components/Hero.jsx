@@ -1,11 +1,31 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TypeAnimation } from 'react-type-animation'
 import { Link } from 'react-scroll'
 import { FiGithub, FiLinkedin, FiMail, FiArrowDown, FiCode } from 'react-icons/fi'
+import { fetchPortfolioData } from '../portfolioApi'
 import './Hero.css'
 
 export default function Hero() {
   const canvasRef = useRef(null)
+  const [profile, setProfile] = useState({
+    name: "Rajesh Mishra",
+    roles: ["Full Stack Developer", "Python Developer", "Flask & React Developer", "Problem Solver"],
+    hero_bio: "Passionate developer crafting scalable, user-centric web applications. I love turning complex problems into elegant solutions with clean code and modern technologies.",
+    github: "https://github.com/rajeshmishra-11",
+    linkedin: "https://www.linkedin.com/in/rajesh-mishra-cse",
+    geeksforgeeks: "https://www.geeksforgeeks.org/profile/rajeshmishhica",
+    email: "rajeshmishra847410@gmail.com"
+  })
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchPortfolioData()
+      if (data && data.profile) {
+        setProfile(data.profile)
+      }
+    }
+    load()
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -61,26 +81,23 @@ export default function Hero() {
         </div>
 
         <h1 className="hero__name">
-          Hi, I'm <span className="hero__name-highlight">Rajesh Mishra</span>
+          Hi, I'm <span className="hero__name-highlight">{profile.name}</span>
         </h1>
 
         <div className="hero__role">
-          <TypeAnimation
-            sequence={[
-              'Full Stack Developer', 2000,
-              'Python Developer', 2000,
-              'Flask & React Developer', 2000,
-              'Problem Solver', 2000,
-            ]}
-            wrapper="span"
-            speed={50}
-            repeat={Infinity}
-          />
+          {profile.roles && profile.roles.length > 0 && (
+            <TypeAnimation
+              key={JSON.stringify(profile.roles)}
+              sequence={profile.roles.flatMap(r => [r, 2000])}
+              wrapper="span"
+              speed={50}
+              repeat={Infinity}
+            />
+          )}
         </div>
 
         <p className="hero__bio">
-          Passionate developer crafting scalable, user-centric web applications.
-          I love turning complex problems into elegant solutions with clean code and modern technologies.
+          {profile.hero_bio}
         </p>
 
         <div className="hero__actions">
@@ -93,18 +110,26 @@ export default function Hero() {
         </div>
 
         <div className="hero__socials">
-          <a href="https://github.com/rajeshmishra-11" target="_blank" rel="noreferrer" className="hero__social" aria-label="GitHub">
-            <FiGithub size={20} />
-          </a>
-          <a href="https://www.geeksforgeeks.org/profile/rajeshmishhica" target="_blank" rel="noreferrer" className="hero__social" aria-label="GeeksforGeeks" title="GeeksforGeeks">
-            <FiCode size={20} />
-          </a>
-          <a href="https://www.linkedin.com/in/rajesh-mishra-cse" target="_blank" rel="noreferrer" className="hero__social" aria-label="LinkedIn">
-            <FiLinkedin size={20} />
-          </a>
-          <a href="https://mail.google.com/mail/?view=cm&to=rajeshmishra847410@gmail.com" target="_blank" rel="noreferrer" className="hero__social" aria-label="Email">
-            <FiMail size={20} />
-          </a>
+          {profile.github && (
+            <a href={profile.github} target="_blank" rel="noreferrer" className="hero__social" aria-label="GitHub">
+              <FiGithub size={20} />
+            </a>
+          )}
+          {profile.geeksforgeeks && (
+            <a href={profile.geeksforgeeks} target="_blank" rel="noreferrer" className="hero__social" aria-label="GeeksforGeeks" title="GeeksforGeeks">
+              <FiCode size={20} />
+            </a>
+          )}
+          {profile.linkedin && (
+            <a href={profile.linkedin} target="_blank" rel="noreferrer" className="hero__social" aria-label="LinkedIn">
+              <FiLinkedin size={20} />
+            </a>
+          )}
+          {profile.email && (
+            <a href={profile.email.includes('@') && !profile.email.startsWith('http') ? `https://mail.google.com/mail/?view=cm&to=${profile.email}` : profile.email} target="_blank" rel="noreferrer" className="hero__social" aria-label="Email">
+              <FiMail size={20} />
+            </a>
+          )}
         </div>
       </div>
 

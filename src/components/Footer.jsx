@@ -1,14 +1,24 @@
+import { useState, useEffect } from 'react'
 import { FiGithub, FiLinkedin, FiMail, FiHeart, FiCode } from 'react-icons/fi'
 import { Link } from 'react-scroll'
 import './Footer.css'
 
 export default function Footer() {
   const year = new Date().getFullYear()
+  const [imageTimestamp, setImageTimestamp] = useState(localStorage.getItem('profile_img_ts') || '1')
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setImageTimestamp(localStorage.getItem('profile_img_ts') || Date.now().toString())
+    }
+    window.addEventListener('profile-image-updated', handleUpdate)
+    return () => window.removeEventListener('profile-image-updated', handleUpdate)
+  }, [])
   return (
     <footer className="footer">
       <div className="container footer__inner">
         <Link to="hero" smooth duration={500} className="footer__logo">
-          <img src="/profile.jpg" alt="Rajesh Mishra" className="footer__logo-img" />
+          <img src={`/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="footer__logo-img" />
         </Link>
         <p className="footer__copy">
           Made with <FiHeart className="footer__heart" /> by Rajesh Mishra · {year}

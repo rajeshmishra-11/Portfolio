@@ -1,14 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Link } from 'react-scroll'
 import { FiCode, FiAward, FiBook, FiUsers } from 'react-icons/fi'
+import { fetchPortfolioData } from '../portfolioApi'
 import './About.css'
-
-const stats = [
-  { icon: <FiCode />, value: 6, label: 'Projects Built', suffix: '', to: 'projects' },
-  { icon: <FiAward />, value: 4, label: 'Certificates', suffix: '', to: 'certificates' },
-  { icon: <FiBook />, value: 3, label: 'Years Learning', suffix: '', to: 'skills' },
-  { icon: <FiUsers />, value: 2, label: 'Team Projects', suffix: '', to: 'projects' },
-]
 
 function AnimatedCounter({ value, suffix }) {
   const [count, setCount] = useState(0)
@@ -36,7 +30,46 @@ function AnimatedCounter({ value, suffix }) {
 }
 
 export default function About() {
+  const [statsList, setStatsList] = useState([
+    { icon: <FiCode />, value: 6, label: 'Projects Built', suffix: '', to: 'projects' },
+    { icon: <FiAward />, value: 4, label: 'Certificates', suffix: '', to: 'certificates' },
+    { icon: <FiBook />, value: 3, label: 'Years Learning', suffix: '', to: 'skills' },
+    { icon: <FiUsers />, value: 2, label: 'Team Projects', suffix: '', to: 'projects' },
+  ])
+  const [profile, setProfile] = useState({
+    about_bio_1: "I am a motivated and detail-oriented Software Developer with a strong foundation in Python, full-stack web development, and problem-solving. I have experience building responsive and user-focused applications using technologies such as Python, Flask, React, MySQL, JavaScript, and Bootstrap.",
+    about_bio_2: "I am passionate about creating efficient and scalable solutions while continuously improving my technical skills through real-world projects and collaborative learning. Currently in my 4th year of B.Sc AI Honours at Central Tribal University of Andhra Pradesh (CGPA: 7.9), with leadership experience through Campus Mantri at GeeksforGeeks.",
+    about_tags: ['Python', 'Flask', 'React', 'MySQL', 'JavaScript', 'Bootstrap', 'Problem Solver', 'Team Player']
+  })
   const sectionRef = useRef(null)
+
+  const [imageTimestamp, setImageTimestamp] = useState(localStorage.getItem('profile_img_ts') || '1')
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setImageTimestamp(localStorage.getItem('profile_img_ts') || Date.now().toString())
+    }
+    window.addEventListener('profile-image-updated', handleUpdate)
+    return () => window.removeEventListener('profile-image-updated', handleUpdate)
+  }, [])
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchPortfolioData()
+      if (data) {
+        setStatsList([
+          { icon: <FiCode />, value: data.profile?.projects_built !== undefined ? data.profile.projects_built : (data.projects?.length || 6), label: 'Projects Built', suffix: '', to: 'projects' },
+          { icon: <FiAward />, value: data.profile?.certificates_count !== undefined ? data.profile.certificates_count : (data.certificates?.length || 4), label: 'Certificates', suffix: '', to: 'certificates' },
+          { icon: <FiBook />, value: data.profile?.years_learning || 3, label: 'Years Learning', suffix: '', to: 'skills' },
+          { icon: <FiUsers />, value: data.profile?.team_projects || 2, label: 'Team Projects', suffix: '', to: 'projects' },
+        ])
+        if (data.profile) {
+          setProfile(data.profile)
+        }
+      }
+    }
+    load()
+  }, [])
 
   const handleDownload = useCallback(async () => {
     try {
@@ -75,7 +108,7 @@ export default function About() {
             <div className="about__image-wrap">
               <div className="about__image-blob" />
               <div className="about__avatar">
-                <img src="/profile.jpg" alt="Rajesh Mishra" className="about__avatar-img" />
+                <img src={`/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="about__avatar-img" />
               </div>
               <div className="about__image-ring" />
             </div>
@@ -87,22 +120,20 @@ export default function About() {
               Crafting Digital <span>Experiences</span>
             </h2>
             <p className="about__bio">
-              I am a motivated and detail-oriented Software Developer with a strong foundation
-              in Python, full-stack web development, and problem-solving. I have experience
-              building responsive and user-focused applications using technologies such as
-              Python, Flask, React, MySQL, JavaScript, and Bootstrap.
+              {profile.about_bio_1}
             </p>
-            <p className="about__bio">
-              I am passionate about creating efficient and scalable solutions while continuously
-              improving my technical skills through real-world projects and collaborative learning.
-              Currently in my 4th year of B.Sc AI Honours at Central Tribal University of
-              Andhra Pradesh (CGPA: 7.9), with leadership experience through Campus Mantri at GeeksforGeeks.
-            </p>
-            <div className="about__tags">
-              {['Python', 'Flask', 'React', 'MySQL', 'JavaScript', 'Bootstrap', 'Problem Solver', 'Team Player'].map(t => (
-                <span key={t} className="tag">{t}</span>
-              ))}
-            </div>
+            {profile.about_bio_2 && (
+              <p className="about__bio">
+                {profile.about_bio_2}
+              </p>
+            )}
+            {profile.about_tags && profile.about_tags.length > 0 && (
+              <div className="about__tags">
+                {profile.about_tags.map(t => (
+                  <span key={t} className="tag">{t}</span>
+                ))}
+              </div>
+            )}
             <div className="about__actions">
               <button onClick={handleDownload} className="btn btn-primary">
                 Download Resume
@@ -112,7 +143,7 @@ export default function About() {
         </div>
 
         <div className="about__stats">
-          {stats.map((s, i) => (
+          {statsList.map((s, i) => (
             <Link
               key={i}
               to={s.to}

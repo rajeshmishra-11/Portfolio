@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react'
 import { FiGithub, FiExternalLink } from 'react-icons/fi'
+import { fetchPortfolioData } from '../portfolioApi'
 import './Projects.css'
 
-const projects = [
+const staticProjects = [
   {
     title: 'Smart Study Support System',
     description: 'An AI-assisted full-stack study platform built to improve student focus and academic performance.',
@@ -75,6 +77,18 @@ const projects = [
 ]
 
 export default function Projects() {
+  const [list, setList] = useState(staticProjects)
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchPortfolioData()
+      if (data && data.projects && data.projects.length > 0) {
+        setList(data.projects)
+      }
+    }
+    load()
+  }, [])
+
   return (
     <section id="projects" className="section projects">
       <div className="container">
@@ -85,7 +99,7 @@ export default function Projects() {
         </div>
 
         <div className="projects__grid">
-          {projects.map((p, i) => (
+          {list.map((p, i) => (
             <div 
               key={i} 
               className={`project-card glass-card ${p.featured ? 'project-card--featured' : ''}`}

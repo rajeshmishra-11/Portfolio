@@ -1,0 +1,416 @@
+/* ===== ADMIN DASHBOARD STYLES ===== */
+
+.admin-page {
+  padding: 120px 0 60px;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-login {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 40px;
+  position: relative;
+}
+
+.admin-login__title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.admin-login__subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--primary);
+  box-shadow: 0 0 10px rgba(225, 29, 72, 0.15);
+}
+
+.form-control option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.admin-login__btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.admin-login__error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Dashboard Panel */
+.admin-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.admin-header__info h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.admin-header__info p {
+  color: var(--text-secondary);
+}
+
+.admin-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-nav__btn {
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 50px;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.admin-nav__btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-nav__btn--active {
+  color: #fff;
+  background: var(--gradient-hero) !important;
+}
+
+/* Section specific dashboard view */
+.admin-section {
+  padding: 20px 0;
+}
+
+.admin-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-section__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* Items List Grid */
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.admin-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-hover);
+}
+
+.admin-item__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-item__title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.admin-item__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.admin-item__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+
+.admin-btn--edit {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.admin-btn--edit:hover {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.admin-btn--delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.admin-btn--delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* Modals & Forms */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.admin-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+  border: 1px solid var(--border);
+}
+
+.admin-modal__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  font-family: var(--font-heading);
+}
+
+.admin-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+/* Uploader styling */
+.admin-uploader {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.admin-uploader:hover {
+  border-color: var(--primary);
+  background: rgba(225, 29, 72, 0.02);
+}
+
+.admin-uploader__icon {
+  color: var(--primary-light);
+  margin-bottom: 12px;
+}
+
+.admin-uploader__filename {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+.admin-uploader__success {
+  color: #34d399;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+.admin-uploader--dragover {
+  border-color: var(--primary) !important;
+  background: rgba(225, 29, 72, 0.06) !important;
+}
+
+/* Compact uploader inside modals */
+.admin-modal .admin-uploader {
+  padding: 24px;
+}
+
+.admin-modal .admin-uploader p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Premium Layout Modal Styling */
+.layout-choice-modal {
+  max-width: 480px !important;
+  text-align: center;
+  padding: 36px 28px !important;
+}
+
+.layout-choice-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  font-family: var(--font-heading);
+}
+
+.layout-choice-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+.layout-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.layout-option-card {
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.layout-option-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.05), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.layout-option-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(225, 29, 72, 0.08);
+}
+
+.layout-option-card:hover::before {
+  opacity: 1;
+}
+
+.layout-option-card__title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.layout-option-card__desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.layout-modal-cancel {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.layout-modal-cancel:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-hover);
+}

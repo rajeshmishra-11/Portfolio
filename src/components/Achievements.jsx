@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FiStar, FiCode, FiUsers, FiTrendingUp, FiZap, FiX, FiExternalLink, FiDownload } from 'react-icons/fi'
+import { fetchPortfolioData } from '../portfolioApi'
 import './Achievements.css'
 
-const achievements = [
+const staticAchievements = [
   {
     id: 1,
     icon: <FiUsers />,
@@ -82,8 +83,45 @@ const achievements = [
   },
 ]
 
+const COLORS = ['#7c3aed', '#06b6d4', '#22c55e', '#f89820', '#e11d48', '#ec4899']
+
 export default function Achievements() {
+  const [list, setList] = useState(staticAchievements)
   const [selected, setSelected] = useState(null)
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchPortfolioData()
+      if (data && data.achievements && data.achievements.length > 0) {
+        const processed = data.achievements.map((a, i) => {
+          const image = a.image || ''
+          const proofLink = a.proof_link || ''
+          const hasProof = !!image
+          const title = a.title || ''
+          
+          let icon = <FiStar />
+          if (title.includes('Campus') || title.includes('TechSprint')) icon = <FiUsers />
+          else if (title.includes('Recommendation')) icon = <FiTrendingUp />
+          else if (title.includes('Problems')) icon = <FiZap />
+
+          return {
+            ...a,
+            icon,
+            color: (a.color && a.color !== '#f59e0b') ? a.color : COLORS[i % COLORS.length],
+            org: a.org || a.subtitle || '',
+            desc: a.desc || a.description || '',
+            year: a.year || a.date || '',
+            link: a.link || proofLink,
+            hasProof,
+            proofLabel: hasProof ? (title.includes('Recommendation') ? 'View Record' : title.includes('Campus') ? 'View Offer Letter' : 'View Certificate') : null,
+            linkLabel: proofLink ? (proofLink.includes('github') ? 'GitHub Profile' : proofLink.includes('geeksforgeeks') ? 'GFG Profile' : 'View Link') : null
+          }
+        })
+        setList(processed)
+      }
+    }
+    load()
+  }, [])
 
   return (
     <section id="achievements" className="section achievements">
@@ -95,7 +133,7 @@ export default function Achievements() {
         </div>
 
         <div className="achievements__grid">
-          {achievements.map((a) => (
+          {list.map((a) => (
             <div
               key={a.id}
               className={`achievement-card glass-card ${a.hasProof ? 'achievement-card--clickable' : ''}`}

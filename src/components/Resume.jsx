@@ -1,19 +1,16 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { FiDownload, FiExternalLink, FiBook, FiMaximize2, FiX } from 'react-icons/fi'
+import { fetchPortfolioData } from '../portfolioApi'
 import './Resume.css'
 
-const experience = [
+const staticEducation = [
   {
-    type: 'education',
-    icon: <FiBook />,
     title: 'B.Sc Artificial Intelligence Honours with Research',
     org: 'Central Tribal University of Andhra Pradesh',
     period: '2023 – 2027 (4th Year)',
     desc: 'Pursuing a 4-year B.Sc AI Honours with Research programme. Currently in the 4th year with a CGPA of 7.9. Specializing in AI, machine learning, and full-stack development.',
   },
   {
-    type: 'education',
-    icon: <FiBook />,
     title: 'Class 12th — MPC (Math, Physics, Chemistry)',
     org: 'Atal Aadarsh Vidyalaya, Lodi Estate, Delhi — CBSE Board',
     period: '2022 – 2023',
@@ -42,8 +39,30 @@ function getPdfSrc(fullscreen = false) {
     : '/resume.pdf#toolbar=0&view=FitH'
 }
 
+const COLORS = ['#7c3aed', '#00758f', '#f59e0b', '#06b6d4', '#22c55e', '#e11d48']
+
 export default function Resume() {
   const [fullscreen, setFullscreen] = useState(false)
+  const [list, setList] = useState(() => 
+    staticEducation.map((e, idx) => ({
+      ...e,
+      color: COLORS[idx % COLORS.length]
+    }))
+  )
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchPortfolioData()
+      if (data && data.education && data.education.length > 0) {
+        const processed = data.education.map((e, idx) => ({
+          ...e,
+          color: (e.color && e.color !== '#06b6d4') ? e.color : COLORS[idx % COLORS.length]
+        }))
+        setList(processed)
+      }
+    }
+    load()
+  }, [])
 
   const handleDownload = useCallback(async () => {
     try {
@@ -76,15 +95,46 @@ export default function Resume() {
         <div className="resume__layout">
           {/* Timeline */}
           <div className="resume__timeline">
-            {experience.map((item, i) => (
-              <div key={i} className={`timeline-item timeline-item--${item.type}`}>
-                <div className="timeline-item__icon">{item.icon}</div>
+            {list.map((item, i) => (
+              <div key={item.id || i} className="timeline-item timeline-item--education">
+                <div 
+                  className="timeline-item__icon"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${item.color}, ${item.color}bb)`,
+                    boxShadow: `0 0 20px ${item.color}66`
+                  }}
+                >
+                  <FiBook />
+                </div>
                 <div className="timeline-item__line" />
-                <div className="timeline-item__card glass-card">
+                <div 
+                  className="timeline-item__card glass-card"
+                  style={{ 
+                    borderLeft: `4px solid ${item.color}`,
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div 
+                    className="timeline-item__glow" 
+                    style={{ 
+                      position: 'absolute', 
+                      inset: 0, 
+                      background: `radial-gradient(circle at top right, ${item.color}0c, transparent 60%)`,
+                      pointerEvents: 'none' 
+                    }} 
+                  />
                   <div className="timeline-item__header">
                     <span className="timeline-item__period">{item.period}</span>
-                    <span className={`tag ${item.type === 'education' ? 'tag-cyan' : ''}`}>
-                      {item.type === 'education' ? 'Education' : item.type === 'project' ? 'Project' : 'Achievement'}
+                    <span 
+                      className="tag"
+                      style={{
+                        background: `${item.color}15`,
+                        color: item.color,
+                        border: `1px solid ${item.color}33`
+                      }}
+                    >
+                      Education
                     </span>
                   </div>
                   <h3 className="timeline-item__title">{item.title}</h3>

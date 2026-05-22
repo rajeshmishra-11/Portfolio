@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment and DB files (DO NOT PUSH TO GIT)
+.env
+backend/.env
+*.db
+backend/*.db
+.venv/
+backend/.venv/

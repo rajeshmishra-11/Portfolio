@@ -1,4 +1,7 @@
 import os
+import sys
+# Adjust python path so Vercel serverless runtime can find database.py and seed.py
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import shutil
 import random
 import time

@@ -30,6 +30,12 @@ export default function Experience({ data }) {
   // Smart document server check to identify missing files
   useEffect(() => {
     if (selectedProof && selectedProof.proof) {
+      if (selectedProof.proof.includes('drive.google.com')) {
+        setDocLoadFailed(false)
+        setLoadingDoc(false)
+        return
+      }
+
       const absoluteUrl = selectedProof.proof.startsWith('http') 
         ? selectedProof.proof 
         : `${window.location.origin}${selectedProof.proof}`
@@ -287,7 +293,19 @@ export default function Experience({ data }) {
                     </div>
                   </div>
                 </div>
-              ) : selectedProof.proof.toLowerCase().endsWith('.pdf') ? (() => {
+              ) : selectedProof.proof.includes('drive.google.com') ? (() => {
+                const fileDMatch = selectedProof.proof.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
+                const idMatch = selectedProof.proof.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+                const fileId = fileDMatch ? fileDMatch[1] : (idMatch ? idMatch[1] : '')
+                const previewUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview` : selectedProof.proof
+                return (
+                  <iframe
+                    src={previewUrl}
+                    title={selectedProof.company}
+                    className="exp-modal__iframe"
+                  />
+                )
+              })() : selectedProof.proof.toLowerCase().endsWith('.pdf') ? (() => {
                 const isMobile = navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(navigator.userAgent)
                 const absoluteUrl = selectedProof.proof.startsWith('http') 
                   ? selectedProof.proof 
@@ -305,7 +323,7 @@ export default function Experience({ data }) {
                 )
               })() : (
                 <img
-                  src={selectedProof.proof.startsWith('http') ? selectedProof.proof : `${window.location.origin}${selectedProof.proof}`}
+                  src={selectedProof.proof.includes('drive.google.com') ? `https://drive.google.com/uc?export=download&id=${selectedProof.proof.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)?.[1] || selectedProof.proof.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1] || ''}` : (selectedProof.proof.startsWith('http') ? selectedProof.proof : `${window.location.origin}${selectedProof.proof}`)}
                   alt={selectedProof.company}
                   className="exp-modal__img"
                 />

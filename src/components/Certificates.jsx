@@ -156,7 +156,19 @@ export default function Certificates({ data }) {
 
             {/* Certificate Viewer */}
             <div className="cert-modal__viewer">
-              {selected.type === 'pdf' ? (() => {
+              {selected.file && selected.file.includes('drive.google.com') ? (() => {
+                const fileDMatch = selected.file.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
+                const idMatch = selected.file.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+                const fileId = fileDMatch ? fileDMatch[1] : (idMatch ? idMatch[1] : '')
+                const previewUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview` : selected.file
+                return (
+                  <iframe
+                    src={previewUrl}
+                    title={selected.title}
+                    className="cert-modal__iframe"
+                  />
+                )
+              })() : selected.type === 'pdf' ? (() => {
                 const isMobile = navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(navigator.userAgent)
                 const pdfUrl = isMobile
                   ? `https://docs.google.com/viewer?url=${encodeURIComponent(window.location.origin + selected.file)}&embedded=true`
@@ -170,7 +182,7 @@ export default function Certificates({ data }) {
                 )
               })() : (
                 <img
-                  src={selected.file}
+                  src={selected.file.includes('drive.google.com') ? `https://drive.google.com/uc?export=download&id=${selected.file.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)?.[1] || selected.file.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1] || ''}` : selected.file}
                   alt={selected.title}
                   className="cert-modal__img"
                 />

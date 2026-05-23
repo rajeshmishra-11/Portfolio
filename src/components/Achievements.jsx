@@ -227,7 +227,19 @@ export default function Achievements({ data }) {
 
             {/* Document / Image Viewer */}
             <div className="achievement-modal__viewer">
-              {selected.image?.endsWith('.pdf') ? (() => {
+              {selected.image && selected.image.includes('drive.google.com') ? (() => {
+                const fileDMatch = selected.image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
+                const idMatch = selected.image.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+                const fileId = fileDMatch ? fileDMatch[1] : (idMatch ? idMatch[1] : '')
+                const previewUrl = fileId ? `https://drive.google.com/file/d/${fileId}/preview` : selected.image
+                return (
+                  <iframe
+                    src={previewUrl}
+                    title={selected.title}
+                    className="achievement-modal__pdf"
+                  />
+                )
+              })() : selected.image?.endsWith('.pdf') ? (() => {
                 const isMobile = navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(navigator.userAgent)
                 const pdfUrl = isMobile
                   ? `https://docs.google.com/viewer?url=${encodeURIComponent(window.location.origin + selected.image)}&embedded=true`
@@ -241,7 +253,7 @@ export default function Achievements({ data }) {
                 )
               })() : (
                 <img
-                  src={selected.image}
+                  src={selected.image && selected.image.includes('drive.google.com') ? `https://drive.google.com/uc?export=download&id=${selected.image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)?.[1] || selected.image.match(/[?&]id=([a-zA-Z0-9_-]+)/)?.[1] || ''}` : selected.image}
                   alt={selected.title}
                   className="achievement-modal__img"
                 />

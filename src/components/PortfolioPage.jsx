@@ -10,33 +10,34 @@ import Achievements from './Achievements'
 import Resume from './Resume'
 import Contact from './Contact'
 
-export default function PortfolioPage() {
+export default function PortfolioPage({ data }) {
   const [showExperience, setShowExperience] = useState(false)
   const [showProjects, setShowProjects] = useState(true)
 
   useEffect(() => {
     async function checkExperienceToggle() {
-      const data = await fetchPortfolioData()
-      if (data && data.profile) {
-        setShowExperience(!!data.profile.show_experience)
-        setShowProjects(data.profile.show_projects !== undefined ? !!data.profile.show_projects : true)
+      const finalData = data || await fetchPortfolioData()
+      if (finalData && finalData.profile) {
+        setShowExperience(!!finalData.profile.show_experience)
+        setShowProjects(finalData.profile.show_projects !== undefined ? !!finalData.profile.show_projects : true)
       }
     }
     checkExperienceToggle()
-  }, [])
+  }, [data])
 
   return (
     <>
-      <Hero />
-      <About />
-      <Skills />
-      {showExperience && <Experience />}
-      {(!showExperience || showProjects) && <Projects />}
-      <Certificates />
-      <Achievements />
-      <Resume />
+      <Hero data={data} />
+      <About data={data} />
+      <Skills data={data} />
+      {showExperience && <Experience data={data} />}
+      {(!showExperience || showProjects) && <Projects data={data} />}
+      <Certificates data={data} />
+      <Achievements data={data} />
+      <Resume data={data} />
       <Contact />
     </>
   )
 }
+
 

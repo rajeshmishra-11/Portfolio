@@ -3,7 +3,7 @@ import { FiBriefcase, FiCompass, FiAward, FiBookOpen, FiArrowRight, FiFileText, 
 import { fetchPortfolioData } from '../portfolioApi'
 import './Experience.css'
 
-export default function Experience() {
+export default function Experience({ data }) {
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedProof, setSelectedProof] = useState(null)
@@ -14,9 +14,9 @@ export default function Experience() {
   useEffect(() => {
     async function load() {
       try {
-        const data = await fetchPortfolioData()
-        if (data && data.experiences) {
-          setList(data.experiences)
+        const finalData = data || await fetchPortfolioData()
+        if (finalData && finalData.experiences) {
+          setList(finalData.experiences)
         }
       } catch (err) {
         console.error("Failed to load experiences", err)
@@ -25,7 +25,7 @@ export default function Experience() {
       }
     }
     load()
-  }, [])
+  }, [data])
 
   // Smart document server check to identify missing files
   useEffect(() => {

@@ -76,18 +76,18 @@ const staticProjects = [
   },
 ]
 
-export default function Projects() {
+export default function Projects({ data }) {
   const [list, setList] = useState(staticProjects)
 
   useEffect(() => {
     async function load() {
-      const data = await fetchPortfolioData()
-      if (data && data.projects && data.projects.length > 0) {
-        setList(data.projects)
+      const finalData = data || await fetchPortfolioData()
+      if (finalData && finalData.projects && finalData.projects.length > 0) {
+        setList(finalData.projects)
       }
     }
     load()
-  }, [])
+  }, [data])
 
   return (
     <section id="projects" className="section projects">

@@ -7,7 +7,7 @@ import { useTheme } from '../ThemeContext'
 import { fetchPortfolioData } from '../portfolioApi'
 import './Navbar.css'
 
-export default function Navbar() {
+export default function Navbar({ data }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [showExperience, setShowExperience] = useState(false)
@@ -29,17 +29,18 @@ export default function Navbar() {
   useEffect(() => {
     async function checkExperienceToggle() {
       try {
-        const data = await fetchPortfolioData()
-        if (data && data.profile) {
-          setShowExperience(!!data.profile.show_experience)
-          setShowProjects(data.profile.show_projects !== undefined ? !!data.profile.show_projects : true)
+        const finalData = data || await fetchPortfolioData()
+        if (finalData && finalData.profile) {
+          setShowExperience(!!finalData.profile.show_experience)
+          setShowProjects(finalData.profile.show_projects !== undefined ? !!finalData.profile.show_projects : true)
         }
       } catch (err) {
         console.error("Navbar failed to fetch portfolio data", err)
       }
     }
     checkExperienceToggle()
-  }, [location.pathname]) // Refresh on navigation changes
+  }, [data, location.pathname]) // Refresh on navigation changes or data change
+
 
   const navLinks = [
     { label: 'Home', to: 'hero' },

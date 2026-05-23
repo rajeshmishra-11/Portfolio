@@ -29,7 +29,7 @@ function AnimatedCounter({ value, suffix }) {
   return <span ref={ref}>{count}{suffix}</span>
 }
 
-export default function About() {
+export default function About({ data }) {
   const [statsList, setStatsList] = useState([
     { icon: <FiCode />, value: 6, label: 'Projects Built', suffix: '', to: 'projects' },
     { icon: <FiAward />, value: 4, label: 'Certificates', suffix: '', to: 'certificates' },
@@ -55,21 +55,21 @@ export default function About() {
 
   useEffect(() => {
     async function load() {
-      const data = await fetchPortfolioData()
-      if (data) {
+      const finalData = data || await fetchPortfolioData()
+      if (finalData) {
         setStatsList([
-          { icon: <FiCode />, value: data.profile?.projects_built !== undefined ? data.profile.projects_built : (data.projects?.length || 6), label: 'Projects Built', suffix: '', to: 'projects' },
-          { icon: <FiAward />, value: data.profile?.certificates_count !== undefined ? data.profile.certificates_count : (data.certificates?.length || 4), label: 'Certificates', suffix: '', to: 'certificates' },
-          { icon: <FiBook />, value: data.profile?.years_learning || 3, label: 'Years Learning', suffix: '', to: 'skills' },
-          { icon: <FiUsers />, value: data.profile?.team_projects || 2, label: 'Team Projects', suffix: '', to: 'projects' },
+          { icon: <FiCode />, value: finalData.profile?.projects_built !== undefined ? finalData.profile.projects_built : (finalData.projects?.length || 6), label: 'Projects Built', suffix: '', to: 'projects' },
+          { icon: <FiAward />, value: finalData.profile?.certificates_count !== undefined ? finalData.profile.certificates_count : (finalData.certificates?.length || 4), label: 'Certificates', suffix: '', to: 'certificates' },
+          { icon: <FiBook />, value: finalData.profile?.years_learning || 3, label: 'Years Learning', suffix: '', to: 'skills' },
+          { icon: <FiUsers />, value: finalData.profile?.team_projects || 2, label: 'Team Projects', suffix: '', to: 'projects' },
         ])
-        if (data.profile) {
-          setProfile(data.profile)
+        if (finalData.profile) {
+          setProfile(finalData.profile)
         }
       }
     }
     load()
-  }, [])
+  }, [data])
 
   const handleDownload = useCallback(async () => {
     try {

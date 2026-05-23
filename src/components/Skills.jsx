@@ -206,7 +206,7 @@ function resolveIcon(name) {
 }
 
 
-export default function Skills() {
+export default function Skills({ data }) {
   const [bars, setBars] = useState(staticSkillBars)
   const [categories, setCategories] = useState(staticTechCategories)
   const [sePrinciples, setSePrinciples] = useState([
@@ -217,12 +217,12 @@ export default function Skills() {
 
   useEffect(() => {
     async function load() {
-      const data = await fetchPortfolioData()
-      if (data && data.skills && data.skills.length > 0) {
-        const rawBars = data.skills.filter(s => s.category === 'Languages')
-        const rawFrameworks = data.skills.filter(s => s.category === 'Frameworks')
-        const rawTools = data.skills.filter(s => s.category === 'Tools' || s.category === 'Cloud & Tools')
-        const rawSE = data.skills.filter(s => s.category === 'Software Engineering')
+      const finalData = data || await fetchPortfolioData()
+      if (finalData && finalData.skills && finalData.skills.length > 0) {
+        const rawBars = finalData.skills.filter(s => s.category === 'Languages')
+        const rawFrameworks = finalData.skills.filter(s => s.category === 'Frameworks')
+        const rawTools = finalData.skills.filter(s => s.category === 'Tools' || s.category === 'Cloud & Tools')
+        const rawSE = finalData.skills.filter(s => s.category === 'Software Engineering')
 
         const mappedBars = rawBars.map(s => {
           const resolved = resolveIcon(s.name)
@@ -276,7 +276,7 @@ export default function Skills() {
       }
     }
     load()
-  }, [])
+  }, [data])
 
   useEffect(() => {
     const observer = new IntersectionObserver(

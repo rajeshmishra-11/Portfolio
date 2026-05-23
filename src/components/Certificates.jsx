@@ -49,15 +49,15 @@ const staticCertificates = [
 
 const COLORS = ['#7c3aed', '#00758f', '#f59e0b', '#06b6d4', '#22c55e', '#e11d48']
 
-export default function Certificates() {
+export default function Certificates({ data }) {
   const [list, setList] = useState(staticCertificates)
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     async function load() {
-      const data = await fetchPortfolioData()
-      if (data && data.certificates && data.certificates.length > 0) {
-        const processed = data.certificates.map((c, i) => {
+      const finalData = data || await fetchPortfolioData()
+      if (finalData && finalData.certificates && finalData.certificates.length > 0) {
+        const processed = finalData.certificates.map((c, i) => {
           const file = c.file || c.image || ''
           return {
             ...c,
@@ -71,7 +71,7 @@ export default function Certificates() {
       }
     }
     load()
-  }, [])
+  }, [data])
 
 
   return (

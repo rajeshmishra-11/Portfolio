@@ -85,15 +85,15 @@ const staticAchievements = [
 
 const COLORS = ['#7c3aed', '#06b6d4', '#22c55e', '#f89820', '#e11d48', '#ec4899']
 
-export default function Achievements() {
+export default function Achievements({ data }) {
   const [list, setList] = useState(staticAchievements)
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     async function load() {
-      const data = await fetchPortfolioData()
-      if (data && data.achievements && data.achievements.length > 0) {
-        const processed = data.achievements.map((a, i) => {
+      const finalData = data || await fetchPortfolioData()
+      if (finalData && finalData.achievements && finalData.achievements.length > 0) {
+        const processed = finalData.achievements.map((a, i) => {
           const image = a.image || ''
           const proofLink = a.proof_link || ''
           const hasProof = !!image
@@ -121,7 +121,7 @@ export default function Achievements() {
       }
     }
     load()
-  }, [])
+  }, [data])
 
   return (
     <section id="achievements" className="section achievements">

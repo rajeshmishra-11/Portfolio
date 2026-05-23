@@ -41,7 +41,7 @@ function getPdfSrc(fullscreen = false) {
 
 const COLORS = ['#7c3aed', '#00758f', '#f59e0b', '#06b6d4', '#22c55e', '#e11d48']
 
-export default function Resume() {
+export default function Resume({ data }) {
   const [fullscreen, setFullscreen] = useState(false)
   const [list, setList] = useState(() => 
     staticEducation.map((e, idx) => ({
@@ -52,9 +52,9 @@ export default function Resume() {
 
   useEffect(() => {
     async function load() {
-      const data = await fetchPortfolioData()
-      if (data && data.education && data.education.length > 0) {
-        const processed = data.education.map((e, idx) => ({
+      const finalData = data || await fetchPortfolioData()
+      if (finalData && finalData.education && finalData.education.length > 0) {
+        const processed = finalData.education.map((e, idx) => ({
           ...e,
           color: (e.color && e.color !== '#06b6d4') ? e.color : COLORS[idx % COLORS.length]
         }))
@@ -62,7 +62,7 @@ export default function Resume() {
       }
     }
     load()
-  }, [])
+  }, [data])
 
   const handleDownload = useCallback(async () => {
     try {

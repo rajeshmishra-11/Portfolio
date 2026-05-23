@@ -5,7 +5,7 @@ import { FiGithub, FiLinkedin, FiMail, FiArrowDown, FiCode } from 'react-icons/f
 import { fetchPortfolioData } from '../portfolioApi'
 import './Hero.css'
 
-export default function Hero() {
+export default function Hero({ data }) {
   const canvasRef = useRef(null)
   const [profile, setProfile] = useState({
     name: "Rajesh Mishra",
@@ -19,13 +19,14 @@ export default function Hero() {
 
   useEffect(() => {
     async function load() {
-      const data = await fetchPortfolioData()
-      if (data && data.profile) {
-        setProfile(data.profile)
+      const finalData = data || await fetchPortfolioData()
+      if (finalData && finalData.profile) {
+        setProfile(finalData.profile)
       }
     }
     load()
-  }, [])
+  }, [data])
+
 
   useEffect(() => {
     const canvas = canvasRef.current

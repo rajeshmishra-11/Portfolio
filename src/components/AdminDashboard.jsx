@@ -6,6 +6,7 @@ import {
   FiBook, FiBriefcase
 } from 'react-icons/fi'
 import './AdminDashboard.css'
+import { clearPortfolioCache } from '../portfolioApi'
 
 const API_BASE_URL = '/api'
 
@@ -108,6 +109,7 @@ export default function AdminDashboard() {
 
   // Fetch all portfolio data
   const fetchPortfolioData = async () => {
+    clearPortfolioCache()
     setLoading(true)
     try {
       const res = await fetch(`${API_BASE_URL}/portfolio`)

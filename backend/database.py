@@ -112,6 +112,7 @@ class Profile(Base):
     certificates_count = Column(Integer, nullable=False, default=4)
     show_experience = Column(Boolean, nullable=False, default=False)
     show_projects = Column(Boolean, nullable=False, default=True)
+    resume_url = Column(String, nullable=True, default="/resume.pdf")
 
 
 class Experience(Base):

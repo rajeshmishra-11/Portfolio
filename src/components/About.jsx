@@ -41,6 +41,7 @@ export default function About({ data }) {
     about_bio_2: "I am passionate about creating efficient and scalable solutions while continuously improving my technical skills through real-world projects and collaborative learning. Currently in my 4th year of B.Sc AI Honours at Central Tribal University of Andhra Pradesh (CGPA: 7.9), with leadership experience through Campus Mantri at GeeksforGeeks.",
     about_tags: ['Python', 'Flask', 'React', 'MySQL', 'JavaScript', 'Bootstrap', 'Problem Solver', 'Team Player']
   })
+  const [resumeUrl, setResumeUrl] = useState('/resume.pdf')
   const sectionRef = useRef(null)
 
   const [imageTimestamp, setImageTimestamp] = useState(localStorage.getItem('profile_img_ts') || '1')
@@ -65,6 +66,9 @@ export default function About({ data }) {
         ])
         if (finalData.profile) {
           setProfile(finalData.profile)
+          if (finalData.profile.resume_url) {
+            setResumeUrl(finalData.profile.resume_url)
+          }
         }
       }
     }
@@ -72,8 +76,12 @@ export default function About({ data }) {
   }, [data])
 
   const handleDownload = useCallback(async () => {
+    if (resumeUrl.startsWith('http')) {
+      window.open(resumeUrl, '_blank')
+      return
+    }
     try {
-      const res = await fetch('/resume.pdf')
+      const res = await fetch(resumeUrl)
       if (!res.ok) throw new Error('fetch failed')
       const blob = await res.blob()
       // Use octet-stream to force download instead of browser PDF preview
@@ -87,9 +95,9 @@ export default function About({ data }) {
       a.click()
       setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url) }, 200)
     } catch {
-      window.open('/resume.pdf', '_blank')
+      window.open(resumeUrl, '_blank')
     }
-  }, [])
+  }, [resumeUrl])
 
   useEffect(() => {
     const observer = new IntersectionObserver(

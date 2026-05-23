@@ -22,12 +22,24 @@ const staticEducation = [
 // they show a download/open prompt instead of the actual content.
 // Google Docs Viewer converts the PDF to renderable HTML on-the-fly,
 // so the resume appears visually on phones just like on desktop.
-function getPdfSrc(fullscreen = false) {
+function getPdfSrc(url, fullscreen = false) {
   const isMobile =
     typeof navigator !== 'undefined' &&
     (navigator.maxTouchPoints > 0 || /Mobi|Android/i.test(navigator.userAgent))
 
-  const absoluteUrl = `${window.location.origin}/resume.pdf`
+  // If it's a Google Drive link, use the preview URL directly
+  if (url.includes('drive.google.com')) {
+    const fileDMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
+    const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+    const fileId = fileDMatch ? fileDMatch[1] : (idMatch ? idMatch[1] : '')
+    if (fileId) {
+      return `https://drive.google.com/file/d/${fileId}/preview`
+    }
+  }
+
+  const absoluteUrl = url.startsWith('http') 
+    ? url 
+    : `${window.location.origin}${url}`
 
   if (isMobile) {
     return `https://docs.google.com/viewer?url=${encodeURIComponent(absoluteUrl)}&embedded=true`
@@ -35,14 +47,15 @@ function getPdfSrc(fullscreen = false) {
 
   // Desktop — native browser PDF rendering
   return fullscreen
-    ? '/resume.pdf#toolbar=1&view=FitH&zoom=page-width'
-    : '/resume.pdf#toolbar=0&view=FitH'
+    ? `${url}#toolbar=1&view=FitH&zoom=page-width`
+    : `${url}#toolbar=0&view=FitH`
 }
 
 const COLORS = ['#7c3aed', '#00758f', '#f59e0b', '#06b6d4', '#22c55e', '#e11d48']
 
 export default function Resume({ data }) {
   const [fullscreen, setFullscreen] = useState(false)
+  const [resumeUrl, setResumeUrl] = useState('/resume.pdf')
   const [list, setList] = useState(() => 
     staticEducation.map((e, idx) => ({
       ...e,
@@ -53,20 +66,29 @@ export default function Resume({ data }) {
   useEffect(() => {
     async function load() {
       const finalData = data || await fetchPortfolioData()
-      if (finalData && finalData.education && finalData.education.length > 0) {
-        const processed = finalData.education.map((e, idx) => ({
-          ...e,
-          color: (e.color && e.color !== '#06b6d4') ? e.color : COLORS[idx % COLORS.length]
-        }))
-        setList(processed)
+      if (finalData) {
+        if (finalData.education && finalData.education.length > 0) {
+          const processed = finalData.education.map((e, idx) => ({
+            ...e,
+            color: (e.color && e.color !== '#06b6d4') ? e.color : COLORS[idx % COLORS.length]
+          }))
+          setList(processed)
+        }
+        if (finalData.profile && finalData.profile.resume_url) {
+          setResumeUrl(finalData.profile.resume_url)
+        }
       }
     }
     load()
   }, [data])
 
   const handleDownload = useCallback(async () => {
+    if (resumeUrl.startsWith('http')) {
+      window.open(resumeUrl, '_blank')
+      return
+    }
     try {
-      const res = await fetch('/resume.pdf')
+      const res = await fetch(resumeUrl)
       if (!res.ok) throw new Error('fetch failed')
       const blob = await res.blob()
       const forceBlob = new Blob([blob], { type: 'application/octet-stream' })
@@ -79,9 +101,9 @@ export default function Resume({ data }) {
       a.click()
       setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url) }, 200)
     } catch {
-      window.open('/resume.pdf', '_blank')
+      window.open(resumeUrl, '_blank')
     }
-  }, [])
+  }, [resumeUrl])
 
   return (
     <section id="resume" className="section resume">
@@ -158,7 +180,7 @@ export default function Resume({ data }) {
                   <FiMaximize2 size={16} />
                 </button>
                 <a
-                  href="/resume.pdf"
+                  href={resumeUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="resume__pdf-btn"
@@ -178,7 +200,7 @@ export default function Resume({ data }) {
 
             <div className="resume__pdf-embed-wrap glass-card">
               <iframe
-                src={getPdfSrc(false)}
+                src={getPdfSrc(resumeUrl, false)}
                 title="Rajesh Mishra Resume"
                 className="resume__pdf-iframe"
               />
@@ -207,7 +229,7 @@ export default function Resume({ data }) {
               </div>
             </div>
             <iframe
-              src={getPdfSrc(true)}
+              src={getPdfSrc(resumeUrl, true)}
               title="Resume Fullscreen"
               className="resume__fullscreen-iframe"
             />

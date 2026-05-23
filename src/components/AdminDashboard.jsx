@@ -70,7 +70,8 @@ export default function AdminDashboard() {
     about_tags: '', github: '', linkedin: '', geeksforgeeks: '', email: '',
     years_learning: 3, team_projects: 2, projects_built: 6, certificates_count: 4,
     show_experience: false,
-    show_projects: true
+    show_projects: true,
+    resume_url: '/resume.pdf'
   })
   const [showLayoutModal, setShowLayoutModal] = useState(false)
   const [savingProfile, setSavingProfile] = useState(false)
@@ -133,7 +134,8 @@ export default function AdminDashboard() {
             projects_built: data.profile.projects_built !== undefined ? data.profile.projects_built : 6,
             certificates_count: data.profile.certificates_count !== undefined ? data.profile.certificates_count : 4,
             show_experience: data.profile.show_experience !== undefined ? !!data.profile.show_experience : false,
-            show_projects: data.profile.show_projects !== undefined ? !!data.profile.show_projects : true
+            show_projects: data.profile.show_projects !== undefined ? !!data.profile.show_projects : true,
+            resume_url: data.profile.resume_url || '/resume.pdf'
           })
         }
       }
@@ -538,7 +540,8 @@ export default function AdminDashboard() {
       projects_built: parseInt(profileForm.projects_built) || 0,
       certificates_count: parseInt(profileForm.certificates_count) || 0,
       show_experience: !!profileForm.show_experience,
-      show_projects: !!profileForm.show_projects
+      show_projects: !!profileForm.show_projects,
+      resume_url: profileForm.resume_url || '/resume.pdf'
     }
 
     try {
@@ -1281,6 +1284,17 @@ export default function AdminDashboard() {
                           className="form-control"
                           value={profileForm.email}
                           onChange={e => setProfileForm({ ...profileForm, email: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Resume PDF URL (e.g. Google Drive Link or local path)</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="e.g. https://drive.google.com/file/d/.../view"
+                          value={profileForm.resume_url}
+                          onChange={e => setProfileForm({ ...profileForm, resume_url: e.target.value })}
                         />
                       </div>
 

@@ -47,33 +47,46 @@ except Exception as e:
     print(f"[Warning] Automatic seeding skipped/failed: {e}")
 
 def run_migrations():
-    # Only run SQLite-specific table alterations if we are not connected to PostgreSQL
-    if os.getenv("DATABASE_URL"):
-        print("Connected to PostgreSQL. Skipping SQLite migrations.")
-        return
+    from sqlalchemy import text
+    from database import SessionLocal, engine
 
-    import sqlite3
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(base_dir, "portfolio.db")
-    if os.path.exists(db_path):
+    # 1. First run SQLite-specific alterations for show_projects if needed
+    if not os.getenv("DATABASE_URL"):
+        import sqlite3
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        db_path = os.path.join(base_dir, "portfolio.db")
+        if os.path.exists(db_path):
+            try:
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                cursor.execute("PRAGMA table_info(profile)")
+                columns = [row[1] for row in cursor.fetchall()]
+                if "show_projects" not in columns:
+                    print("Adding column show_projects to profile table...")
+                    cursor.execute("ALTER TABLE profile ADD COLUMN show_projects BOOLEAN DEFAULT 1 NOT NULL")
+                    conn.commit()
+                conn.close()
+            except Exception as e:
+                print(f"[Migration Error] SQLite check failed: {e}")
+
+    # 2. SQL-generic column check and ALTER TABLE for resume_url
+    db = SessionLocal()
+    try:
+        db.execute(text("SELECT resume_url FROM profile LIMIT 1"))
+    except Exception:
+        db.rollback()
         try:
-            print(f"Connecting to database for show_projects migration: {db_path}")
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            cursor.execute("PRAGMA table_info(profile)")
-            columns = [row[1] for row in cursor.fetchall()]
-            if "show_projects" not in columns:
-                print("Adding column show_projects to profile table...")
-                cursor.execute("ALTER TABLE profile ADD COLUMN show_projects BOOLEAN DEFAULT 1 NOT NULL")
-                conn.commit()
-                print("Column show_projects added successfully!")
-            else:
-                print("Column show_projects already exists in profile table.")
-            conn.close()
+            print("Adding column resume_url to profile table...")
+            with engine.begin() as conn:
+                conn.execute(text("ALTER TABLE profile ADD COLUMN resume_url VARCHAR DEFAULT '/resume.pdf'"))
+            print("Column resume_url added successfully!")
         except Exception as e:
-            print(f"[Migration Error] Failed to run automated database migration: {e}")
+            print(f"[Migration Error] Failed to alter profile table to add resume_url: {e}")
+    finally:
+        db.close()
 
 run_migrations()
+
 
 
 app = FastAPI(title="Portfolio Admin API", version="1.0.0")
@@ -181,6 +194,7 @@ class ProfileUpdate(BaseModel):
     certificates_count: int = 4
     show_experience: bool = False
     show_projects: bool = True
+    resume_url: Optional[str] = "/resume.pdf"
 
 # Auth Utilities
 def verify_password(plain_password, hashed_password):
@@ -252,7 +266,8 @@ def get_portfolio_data(db: Session = Depends(get_db)):
             projects_built=6,
             certificates_count=4,
             show_experience=False,
-            show_projects=True
+            show_projects=True,
+            resume_url="/resume.pdf"
         )
         db.add(profile)
         db.commit()
@@ -780,7 +795,8 @@ def get_profile(db: Session = Depends(get_db)):
             projects_built=6,
             certificates_count=4,
             show_experience=False,
-            show_projects=True
+            show_projects=True,
+            resume_url="/resume.pdf"
         )
         db.add(profile)
         db.commit()

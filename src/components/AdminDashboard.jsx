@@ -1481,11 +1481,14 @@ export default function AdminDashboard() {
                         </div>
                       )}
                     </div>
-                    {certificateForm.image && (
-                      <div style={{ marginTop: 8, fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <FiImage size={14} /> Current: <code style={{ color: 'var(--primary)', background: 'rgba(124,58,237,0.1)', padding: '2px 8px', borderRadius: 4 }}>{certificateForm.image}</code>
-                      </div>
-                    )}
+                    <input
+                      type="text"
+                      className="form-control"
+                      style={{ marginTop: 8 }}
+                      placeholder="Or paste Direct Image/PDF URL (e.g. https://i.postimg.cc/xyz/my-cert.png)"
+                      value={certificateForm.image}
+                      onChange={e => setCertificateForm({ ...certificateForm, image: e.target.value })}
+                    />
                   </div>
                   <div className="form-group">
                     <label>Credential Verification URL (Optional)</label>
@@ -1635,11 +1638,14 @@ export default function AdminDashboard() {
                         </div>
                       )}
                     </div>
-                    {achievementForm.image && (
-                      <div style={{ marginTop: 8, fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <FiImage size={14} /> Current: <code style={{ color: 'var(--primary)', background: 'rgba(124,58,237,0.1)', padding: '2px 8px', borderRadius: 4 }}>{achievementForm.image}</code>
-                      </div>
-                    )}
+                    <input
+                      type="text"
+                      className="form-control"
+                      style={{ marginTop: 8 }}
+                      placeholder="Or paste Direct Image/PDF URL (e.g. https://i.postimg.cc/xyz/proof.png)"
+                      value={achievementForm.image}
+                      onChange={e => setAchievementForm({ ...achievementForm, image: e.target.value })}
+                    />
                   </div>
                   <div className="form-group">
                     <label>Proof Verification Link (Optional)</label>
@@ -1848,11 +1854,14 @@ export default function AdminDashboard() {
                         </div>
                       )}
                     </div>
-                    {experienceForm.proof && (
-                      <div style={{ marginTop: 8, fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <FiImage size={14} /> Current Proof: <code style={{ color: 'var(--primary)', background: 'rgba(225,29,72,0.1)', padding: '2px 8px', borderRadius: 4 }}>{experienceForm.proof}</code>
-                      </div>
-                    )}
+                    <input
+                      type="text"
+                      className="form-control"
+                      style={{ marginTop: 8 }}
+                      placeholder="Or paste Direct Image/PDF URL (e.g. https://i.postimg.cc/xyz/proof.png)"
+                      value={experienceForm.proof}
+                      onChange={e => setExperienceForm({ ...experienceForm, proof: e.target.value })}
+                    />
                   </div>
                   <div className="form-group">
                     <label>Highlight Accent Color</label>

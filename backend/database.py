@@ -1,5 +1,5 @@
 import json
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Text, JSON
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, Text, JSON, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -127,6 +127,13 @@ class Experience(Base):
     proof = Column(String, nullable=True)         # optional link/path to offer letter or ID card proof
     order = Column(Integer, default=0)
     color = Column(String, nullable=False, default="#e11d48")
+
+class StoredFile(Base):
+    __tablename__ = "stored_files"
+    id = Column(Integer, primary_key=True, index=True)
+    filename = Column(String, unique=True, index=True, nullable=False)
+    mime_type = Column(String, nullable=False)
+    data = Column(LargeBinary, nullable=False)
 
 # DB dependency helper
 def get_db():

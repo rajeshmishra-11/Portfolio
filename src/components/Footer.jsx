@@ -18,7 +18,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <Link to="hero" smooth duration={500} className="footer__logo">
-          <img src={`/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="footer__logo-img" />
+          <img src={`/api/uploads/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="footer__logo-img" />
         </Link>
         <p className="footer__copy">
           Made with <FiHeart className="footer__heart" /> by Rajesh Mishra · {year}

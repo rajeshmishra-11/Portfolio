@@ -116,7 +116,7 @@ export default function About({ data }) {
             <div className="about__image-wrap">
               <div className="about__image-blob" />
               <div className="about__avatar">
-                <img src={`/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="about__avatar-img" />
+                <img src={`/api/uploads/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="about__avatar-img" />
               </div>
               <div className="about__image-ring" />
             </div>

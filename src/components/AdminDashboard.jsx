@@ -1047,7 +1047,7 @@ export default function AdminDashboard() {
                       <div className="form-group" style={{ marginBottom: 24, display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
                         <div style={{ width: 100, height: 100, borderRadius: '50%', overflow: 'hidden', border: '3px solid var(--primary)', boxShadow: '0 0 15px rgba(225, 29, 72, 0.3)', background: '#111' }}>
                           <img
-                            src={`/profile.jpg?t=${profileImageTimestamp}`}
+                            src={`${API_BASE_URL}/uploads/profile.jpg?t=${profileImageTimestamp}`}
                             alt="Profile Preview"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />

@@ -78,11 +78,11 @@ export default function Navbar({ data }) {
       <div className="navbar__container">
         {isHome ? (
           <Link to="hero" smooth duration={500} className="navbar__logo">
-            <img src={`/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="navbar__logo-img" />
+            <img src={`/api/uploads/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="navbar__logo-img" />
           </Link>
         ) : (
           <RouterLink to="/" className="navbar__logo">
-            <img src={`/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="navbar__logo-img" />
+            <img src={`/api/uploads/profile.jpg?t=${imageTimestamp}`} alt="Rajesh Mishra" className="navbar__logo-img" />
           </RouterLink>
         )}
 

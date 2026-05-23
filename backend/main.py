@@ -34,7 +34,7 @@ from sqlalchemy.orm import Session
 # In-memory store for OTPs (username -> {"otp": str, "expires_at": float})
 active_otps = {}
 
-from database import engine, Base, get_db, User, Project, Certificate, Achievement, Skill, Education, Profile, Experience
+from database import engine, Base, get_db, User, Project, Certificate, Achievement, Skill, Education, Profile, Experience, StoredFile
 
 # Initialize DB tables
 Base.metadata.create_all(bind=engine)
@@ -578,168 +578,231 @@ def delete_skill(skill_id: int, db: Session = Depends(get_db), current_user: Use
 @app.post("/api/resume/upload")
 async def upload_resume(
     file: UploadFile = File(...), 
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Secure uploader that replaces the front-end resume.pdf directly."""
+    """Secure database-backed uploader that stores resume.pdf directly in the database."""
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
         
-    # Target path inside React public folder
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    public_dir = os.path.join(root_dir, "public")
-    dest_path = os.path.join(public_dir, "resume.pdf")
-    
     try:
-        # Ensure public folder exists
-        os.makedirs(public_dir, exist_ok=True)
-        with open(dest_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        return {"detail": "Resume uploaded successfully", "filename": file.filename}
-    except OSError as e:
-        if "Read-only file system" in str(e) or e.errno == 30:
-            raise HTTPException(
-                status_code=400,
-                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
-                       "Please run the portfolio application locally to upload files, or use external hotlinks."
+        file_content = await file.read()
+        filename = "resume.pdf"
+        
+        # Upsert into stored_files
+        stored_file = db.query(StoredFile).filter(StoredFile.filename == filename).first()
+        if stored_file:
+            stored_file.data = file_content
+            stored_file.mime_type = "application/pdf"
+        else:
+            stored_file = StoredFile(
+                filename=filename,
+                mime_type="application/pdf",
+                data=file_content
             )
-        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
+            db.add(stored_file)
+        
+        # Automatically update Profile resume_url to /api/uploads/resume.pdf
+        profile = db.query(Profile).first()
+        if profile:
+            profile.resume_url = "/api/uploads/resume.pdf"
+        else:
+            profile = Profile(
+                name="Rajesh Mishra",
+                resume_url="/api/uploads/resume.pdf"
+            )
+            db.add(profile)
+            
+        db.commit()
+        return {"detail": "Resume uploaded successfully to database", "filename": filename}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to save file to database: {str(e)}")
 
 
 # 6. Certificate Document File Upload
 @app.post("/api/upload/certificate")
 async def upload_certificate_file(
     file: UploadFile = File(...), 
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Secure uploader for certificate documents (images or PDFs)."""
+    """Secure database uploader for certificate documents."""
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in [".pdf", ".jpg", ".jpeg", ".png", ".webp"]:
         raise HTTPException(status_code=400, detail="Only PDF and Image files are allowed")
         
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    dest_dir = os.path.join(root_dir, "public", "certificates")
-    
-    # Generate clean filename
-    filename = file.filename.replace(" ", "_")
-    dest_path = os.path.join(dest_dir, filename)
+    import uuid
+    unique_filename = f"certificates/{uuid.uuid4().hex}{ext}"
     
     try:
-        os.makedirs(dest_dir, exist_ok=True)
-        with open(dest_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        return {"path": f"/certificates/{filename}"}
-    except OSError as e:
-        if "Read-only file system" in str(e) or e.errno == 30:
-            raise HTTPException(
-                status_code=400,
-                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
-                       "Please run the portfolio application locally to upload files, or use external hotlinks."
-            )
-        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
+        file_content = await file.read()
+        
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(file.filename)
+        if not mime_type:
+            mime_type = "application/pdf" if ext == ".pdf" else "image/jpeg"
+            
+        stored_file = StoredFile(
+            filename=unique_filename,
+            mime_type=mime_type,
+            data=file_content
+        )
+        db.add(stored_file)
+        db.commit()
+        
+        return {"path": f"/api/uploads/{unique_filename}"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to save certificate to database: {str(e)}")
 
 
 # 7. Achievement Proof File Upload
 @app.post("/api/upload/achievement")
 async def upload_achievement_file(
     file: UploadFile = File(...), 
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Secure uploader for achievement proof documents (images or PDFs)."""
+    """Secure database uploader for achievement proof documents."""
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in [".pdf", ".jpg", ".jpeg", ".png", ".webp"]:
         raise HTTPException(status_code=400, detail="Only PDF and Image files are allowed")
         
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    dest_dir = os.path.join(root_dir, "public", "achievements")
-    
-    filename = file.filename.replace(" ", "_")
-    dest_path = os.path.join(dest_dir, filename)
+    import uuid
+    unique_filename = f"achievements/{uuid.uuid4().hex}{ext}"
     
     try:
-        os.makedirs(dest_dir, exist_ok=True)
-        with open(dest_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        return {"path": f"/achievements/{filename}"}
-    except OSError as e:
-        if "Read-only file system" in str(e) or e.errno == 30:
-            raise HTTPException(
-                status_code=400,
-                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
-                       "Please run the portfolio application locally to upload files, or use external hotlinks."
-            )
-        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
+        file_content = await file.read()
+        
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(file.filename)
+        if not mime_type:
+            mime_type = "application/pdf" if ext == ".pdf" else "image/jpeg"
+            
+        stored_file = StoredFile(
+            filename=unique_filename,
+            mime_type=mime_type,
+            data=file_content
+        )
+        db.add(stored_file)
+        db.commit()
+        
+        return {"path": f"/api/uploads/{unique_filename}"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to save achievement to database: {str(e)}")
 
 
 # 7b. Experience Proof File Upload
 @app.post("/api/upload/experience")
 async def upload_experience_proof_file(
     file: UploadFile = File(...), 
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Secure uploader for experience verification proof (images or PDFs)."""
+    """Secure database uploader for experience verification proof."""
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in [".pdf", ".jpg", ".jpeg", ".png", ".webp"]:
         raise HTTPException(status_code=400, detail="Only PDF and Image files are allowed")
         
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    dest_dir = os.path.join(root_dir, "public", "experiences", "proofs")
-    
-    filename = file.filename.replace(" ", "_")
-    dest_path = os.path.join(dest_dir, filename)
+    import uuid
+    unique_filename = f"experiences/proofs/{uuid.uuid4().hex}{ext}"
     
     try:
-        os.makedirs(dest_dir, exist_ok=True)
-        with open(dest_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        return {"path": f"/experiences/proofs/{filename}"}
-    except OSError as e:
-        if "Read-only file system" in str(e) or e.errno == 30:
-            raise HTTPException(
-                status_code=400,
-                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
-                       "Please run the portfolio application locally to upload files, or use external hotlinks."
-            )
-        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
+        file_content = await file.read()
+        
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(file.filename)
+        if not mime_type:
+            mime_type = "application/pdf" if ext == ".pdf" else "image/jpeg"
+            
+        stored_file = StoredFile(
+            filename=unique_filename,
+            mime_type=mime_type,
+            data=file_content
+        )
+        db.add(stored_file)
+        db.commit()
+        
+        return {"path": f"/api/uploads/{unique_filename}"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to save experience proof to database: {str(e)}")
 
 
 # 7c. Profile Picture File Upload
 @app.post("/api/profile/upload")
 async def upload_profile_picture(
     file: UploadFile = File(...), 
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Secure uploader that replaces the front-end profile.jpg directly."""
+    """Secure database uploader that replaces the profile picture directly in the database."""
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in [".jpg", ".jpeg", ".png", ".webp"]:
         raise HTTPException(status_code=400, detail="Only JPG, JPEG, PNG, and WEBP files are allowed")
         
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    public_dir = os.path.join(root_dir, "public")
-    dest_path = os.path.join(public_dir, "profile.jpg")
-    
     try:
-        os.makedirs(public_dir, exist_ok=True)
-        with open(dest_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        return {"detail": "Profile picture uploaded successfully", "path": "/profile.jpg"}
-    except OSError as e:
-        if "Read-only file system" in str(e) or e.errno == 30:
-            raise HTTPException(
-                status_code=400,
-                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
-                       "Please run the portfolio application locally to upload files, or use external hotlinks."
+        file_content = await file.read()
+        filename = "profile.jpg"
+        
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(file.filename)
+        if not mime_type:
+            mime_type = "image/jpeg"
+            
+        # Upsert into stored_files
+        stored_file = db.query(StoredFile).filter(StoredFile.filename == filename).first()
+        if stored_file:
+            stored_file.data = file_content
+            stored_file.mime_type = mime_type
+        else:
+            stored_file = StoredFile(
+                filename=filename,
+                mime_type=mime_type,
+                data=file_content
             )
-        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
+            db.add(stored_file)
+            
+        db.commit()
+        return {"detail": "Profile picture uploaded successfully to database", "path": "/api/uploads/profile.jpg"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to save profile picture to database: {str(e)}")
+
+
+# 7d. Dynamic File-Serving Endpoint (Database-Backed with Physical Fallback)
+@app.get("/api/uploads/{filename:path}")
+def get_uploaded_file(filename: str, db: Session = Depends(get_db)):
+    """Serves uploaded images or PDFs from the database, falling back to local files if not found."""
+    # Prevent directory traversal attacks
+    if ".." in filename or filename.startswith("/") or filename.startswith("\\"):
+        raise HTTPException(status_code=400, detail="Invalid filename path")
+        
+    # 1. Query the database first
+    stored_file = db.query(StoredFile).filter(StoredFile.filename == filename).first()
+    if stored_file:
+        from fastapi import Response
+        return Response(content=stored_file.data, media_type=stored_file.mime_type)
+        
+    # 2. Fallback to static local files in the public directory (for pre-seeded default assets)
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    local_path = os.path.join(root_dir, "public", filename)
+    if os.path.exists(local_path) and os.path.isfile(local_path):
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(local_path)
+        if not mime_type:
+            mime_type = "application/octet-stream"
+        try:
+            with open(local_path, "rb") as f:
+                data = f.read()
+            from fastapi import Response
+            return Response(content=data, media_type=mime_type)
+        except Exception:
+            pass
+            
+    raise HTTPException(status_code=404, detail="File not found")
 
 
 

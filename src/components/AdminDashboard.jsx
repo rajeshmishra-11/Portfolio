@@ -18,6 +18,7 @@ export default function AdminDashboard() {
   const [otpRequired, setOtpRequired] = useState(false)
   const [otpCode, setOtpCode] = useState('')
   const [otpError, setOtpError] = useState('')
+  const [otpAttempts, setOtpAttempts] = useState(0)
   const [verificationLoading, setVerificationLoading] = useState(false)
 
   // Dashboard view
@@ -212,8 +213,19 @@ export default function AdminDashboard() {
         localStorage.setItem('admin_token', data.access_token)
         setOtpRequired(false)
         setOtpCode('')
+        setOtpAttempts(0)
       } else {
+        const newAttempts = otpAttempts + 1
         const err = await res.json()
+        // 403 = locked out (backend cleared the session after 3 attempts)
+        if (res.status === 403 || newAttempts >= 3) {
+          setOtpAttempts(0)
+          setOtpRequired(false)
+          setOtpCode('')
+          setLoginError('Too many incorrect codes. Please log in again.')
+          return
+        }
+        setOtpAttempts(newAttempts)
         setOtpError(err.detail || 'Failed to verify verification code.')
       }
     } catch {
@@ -668,6 +680,11 @@ export default function AdminDashboard() {
                       style={{ textAlign: 'center', letterSpacing: '8px', fontSize: '1.25rem', fontWeight: 'bold' }}
                     />
                   </div>
+                  {otpAttempts > 0 && (
+                    <p style={{ fontSize: '0.8rem', color: '#f59e0b', textAlign: 'center', marginBottom: 8 }}>
+                      ⚠️ Attempt {otpAttempts} of 3 — {3 - otpAttempts} remaining before lockout
+                    </p>
+                  )}
                   <button type="submit" className="btn btn-primary admin-login__btn" disabled={verificationLoading}>
                     {verificationLoading ? 'Verifying...' : 'Verify & Enter'} <FiCheckCircle size={16} />
                   </button>
@@ -679,6 +696,7 @@ export default function AdminDashboard() {
                       setOtpRequired(false)
                       setOtpCode('')
                       setOtpError('')
+                      setOtpAttempts(0)
                     }}
                   >
                     Back to Login
@@ -1462,9 +1480,9 @@ export default function AdminDashboard() {
                   </div>
                   <div className="form-group">
                     <label>Certificate File / Image</label>
-                    <div
+                    <label
+                      htmlFor="cert-image-input"
                       className="admin-uploader"
-                      onClick={() => document.getElementById('cert-image-input').click()}
                       onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('admin-uploader--dragover') }}
                       onDragLeave={e => e.currentTarget.classList.remove('admin-uploader--dragover')}
                       onDrop={e => {
@@ -1472,6 +1490,7 @@ export default function AdminDashboard() {
                         e.currentTarget.classList.remove('admin-uploader--dragover')
                         if (e.dataTransfer.files.length > 0) handleCertFileUpload(e.dataTransfer.files[0])
                       }}
+                      style={{ display: 'block', cursor: 'pointer' }}
                     >
                       <FiUpload className="admin-uploader__icon" size={28} />
                       <p>{uploadingCert ? 'Uploading...' : 'Click or drag & drop to upload image/PDF'}</p>
@@ -1494,7 +1513,7 @@ export default function AdminDashboard() {
                           <FiCheckCircle size={14} /> Uploaded successfully!
                         </div>
                       )}
-                    </div>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -1619,9 +1638,9 @@ export default function AdminDashboard() {
                   </div>
                   <div className="form-group">
                     <label>Proof Document / Image (Optional)</label>
-                    <div
+                    <label
+                      htmlFor="ach-image-input"
                       className="admin-uploader"
-                      onClick={() => document.getElementById('ach-image-input').click()}
                       onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('admin-uploader--dragover') }}
                       onDragLeave={e => e.currentTarget.classList.remove('admin-uploader--dragover')}
                       onDrop={e => {
@@ -1629,6 +1648,7 @@ export default function AdminDashboard() {
                         e.currentTarget.classList.remove('admin-uploader--dragover')
                         if (e.dataTransfer.files.length > 0) handleAchFileUpload(e.dataTransfer.files[0])
                       }}
+                      style={{ display: 'block', cursor: 'pointer' }}
                     >
                       <FiUpload className="admin-uploader__icon" size={28} />
                       <p>{uploadingAch ? 'Uploading...' : 'Click or drag & drop to upload image/PDF'}</p>
@@ -1651,7 +1671,7 @@ export default function AdminDashboard() {
                           <FiCheckCircle size={14} /> Uploaded successfully!
                         </div>
                       )}
-                    </div>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -1835,9 +1855,9 @@ export default function AdminDashboard() {
                   </div>
                   <div className="form-group">
                     <label>Verification Proof (Offer Letter / ID Card / Email screenshot) - Optional</label>
-                    <div
+                    <label
+                      htmlFor="exp-proof-input"
                       className="admin-uploader"
-                      onClick={() => document.getElementById('exp-proof-input').click()}
                       onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('admin-uploader--dragover') }}
                       onDragLeave={e => e.currentTarget.classList.remove('admin-uploader--dragover')}
                       onDrop={e => {
@@ -1845,6 +1865,7 @@ export default function AdminDashboard() {
                         e.currentTarget.classList.remove('admin-uploader--dragover')
                         if (e.dataTransfer.files.length > 0) handleExpFileUpload(e.dataTransfer.files[0])
                       }}
+                      style={{ display: 'block', cursor: 'pointer' }}
                     >
                       <FiUpload className="admin-uploader__icon" size={28} />
                       <p>{uploadingExp ? 'Uploading...' : 'Click or drag & drop to upload PDF or Image'}</p>
@@ -1867,7 +1888,7 @@ export default function AdminDashboard() {
                           <FiCheckCircle size={14} /> Uploaded successfully!
                         </div>
                       )}
-                    </div>
+                    </label>
                     <input
                       type="text"
                       className="form-control"

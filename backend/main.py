@@ -31,7 +31,7 @@ import bcrypt
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-# In-memory store for OTPs (username -> {"otp": str, "expires_at": float})
+# In-memory store for OTPs (username -> {"otp": str, "expires_at": float, "attempts": int})
 active_otps = {}
 
 from database import engine, Base, get_db, User, Project, Certificate, Achievement, Skill, Education, Profile, Experience, StoredFile
@@ -399,7 +399,7 @@ def login_json(req: LoginRequest, db: Session = Depends(get_db)):
 
 @app.post("/api/auth/verify-otp", response_model=Token)
 def verify_otp(req: VerifyOTPRequest, db: Session = Depends(get_db)):
-    """Verifies the 6-digit OTP code and returns the access token."""
+    """Verifies the 6-digit OTP code and returns the access token. Locks out after 3 incorrect attempts."""
     username = req.username
     otp_val = req.otp.strip()
     
@@ -418,9 +418,20 @@ def verify_otp(req: VerifyOTPRequest, db: Session = Depends(get_db)):
         )
         
     if otp_entry["otp"] != otp_val:
+        # Increment attempt counter
+        otp_entry["attempts"] = otp_entry.get("attempts", 0) + 1
+        attempts_left = 3 - otp_entry["attempts"]
+        
+        if otp_entry["attempts"] >= 3:
+            # Lock out: remove the OTP session entirely
+            del active_otps[username]
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Too many incorrect attempts. Please log in again."
+            )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect verification code."
+            detail=f"Incorrect verification code. {attempts_left} attempt{'s' if attempts_left != 1 else ''} remaining."
         )
         
     # Validated! Clear OTP from cache
@@ -444,6 +455,17 @@ def verify_otp(req: VerifyOTPRequest, db: Session = Depends(get_db)):
 def verify_token(current_user: User = Depends(get_current_user)):
     """Endpoint to check if the user's token is still valid."""
     return {"status": "valid", "username": current_user.username}
+
+
+# --- HELPER UTILITIES ---
+
+def delete_stored_file_if_uploaded(old_path: str, db: Session):
+    """Deletes a StoredFile from the database if it was uploaded via the API (path starts with /api/uploads/)."""
+    if old_path and old_path.startswith("/api/uploads/"):
+        filename = old_path[len("/api/uploads/"):]
+        stored = db.query(StoredFile).filter(StoredFile.filename == filename).first()
+        if stored:
+            db.delete(stored)
 
 
 # --- PROTECTED CRUD ENDPOINTS ---
@@ -492,6 +514,10 @@ def update_certificate(cert_id: int, cert: CertificateBase, db: Session = Depend
     db_cert = db.query(Certificate).filter(Certificate.id == cert_id).first()
     if not db_cert:
         raise HTTPException(status_code=404, detail="Certificate not found")
+    # Delete old uploaded file from DB if image was replaced with a different uploaded path
+    old_image = db_cert.image
+    if old_image != cert.image:
+        delete_stored_file_if_uploaded(old_image, db)
     for key, value in cert.dict().items():
         setattr(db_cert, key, value)
     db.commit()
@@ -522,6 +548,10 @@ def update_achievement(ach_id: int, ach: AchievementBase, db: Session = Depends(
     db_ach = db.query(Achievement).filter(Achievement.id == ach_id).first()
     if not db_ach:
         raise HTTPException(status_code=404, detail="Achievement not found")
+    # Delete old uploaded file from DB if image was replaced
+    old_image = db_ach.image
+    if old_image != ach.image:
+        delete_stored_file_if_uploaded(old_image, db)
     for key, value in ach.dict().items():
         setattr(db_ach, key, value)
     db.commit()
@@ -805,8 +835,6 @@ def get_uploaded_file(filename: str, db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail="File not found")
 
 
-
-
 # 8. Education
 @app.post("/api/education")
 def create_education(edu: EducationBase, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -893,6 +921,10 @@ def update_experience(exp_id: int, exp: ExperienceBase, db: Session = Depends(ge
     db_exp = db.query(Experience).filter(Experience.id == exp_id).first()
     if not db_exp:
         raise HTTPException(status_code=404, detail="Experience not found")
+    # Delete old uploaded proof file from DB if proof was replaced
+    old_proof = db_exp.proof
+    if old_proof != exp.proof:
+        delete_stored_file_if_uploaded(old_proof, db)
     for key, value in exp.dict().items():
         setattr(db_exp, key, value)
     db.commit()

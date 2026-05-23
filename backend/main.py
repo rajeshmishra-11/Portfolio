@@ -574,13 +574,20 @@ async def upload_resume(
     public_dir = os.path.join(root_dir, "public")
     dest_path = os.path.join(public_dir, "resume.pdf")
     
-    # Ensure public folder exists
-    os.makedirs(public_dir, exist_ok=True)
-    
     try:
+        # Ensure public folder exists
+        os.makedirs(public_dir, exist_ok=True)
         with open(dest_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         return {"detail": "Resume uploaded successfully", "filename": file.filename}
+    except OSError as e:
+        if "Read-only file system" in str(e) or e.errno == 30:
+            raise HTTPException(
+                status_code=400,
+                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
+                       "Please run the portfolio application locally to upload files, or use external hotlinks."
+            )
+        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
 
@@ -598,16 +605,24 @@ async def upload_certificate_file(
         
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     dest_dir = os.path.join(root_dir, "public", "certificates")
-    os.makedirs(dest_dir, exist_ok=True)
     
     # Generate clean filename
     filename = file.filename.replace(" ", "_")
     dest_path = os.path.join(dest_dir, filename)
     
     try:
+        os.makedirs(dest_dir, exist_ok=True)
         with open(dest_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         return {"path": f"/certificates/{filename}"}
+    except OSError as e:
+        if "Read-only file system" in str(e) or e.errno == 30:
+            raise HTTPException(
+                status_code=400,
+                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
+                       "Please run the portfolio application locally to upload files, or use external hotlinks."
+            )
+        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
 
@@ -625,15 +640,23 @@ async def upload_achievement_file(
         
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     dest_dir = os.path.join(root_dir, "public", "achievements")
-    os.makedirs(dest_dir, exist_ok=True)
     
     filename = file.filename.replace(" ", "_")
     dest_path = os.path.join(dest_dir, filename)
     
     try:
+        os.makedirs(dest_dir, exist_ok=True)
         with open(dest_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         return {"path": f"/achievements/{filename}"}
+    except OSError as e:
+        if "Read-only file system" in str(e) or e.errno == 30:
+            raise HTTPException(
+                status_code=400,
+                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
+                       "Please run the portfolio application locally to upload files, or use external hotlinks."
+            )
+        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
 
@@ -651,15 +674,23 @@ async def upload_experience_proof_file(
         
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     dest_dir = os.path.join(root_dir, "public", "experiences", "proofs")
-    os.makedirs(dest_dir, exist_ok=True)
     
     filename = file.filename.replace(" ", "_")
     dest_path = os.path.join(dest_dir, filename)
     
     try:
+        os.makedirs(dest_dir, exist_ok=True)
         with open(dest_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         return {"path": f"/experiences/proofs/{filename}"}
+    except OSError as e:
+        if "Read-only file system" in str(e) or e.errno == 30:
+            raise HTTPException(
+                status_code=400,
+                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
+                       "Please run the portfolio application locally to upload files, or use external hotlinks."
+            )
+        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
 
@@ -679,14 +710,22 @@ async def upload_profile_picture(
     public_dir = os.path.join(root_dir, "public")
     dest_path = os.path.join(public_dir, "profile.jpg")
     
-    os.makedirs(public_dir, exist_ok=True)
-    
     try:
+        os.makedirs(public_dir, exist_ok=True)
         with open(dest_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         return {"detail": "Profile picture uploaded successfully", "path": "/profile.jpg"}
+    except OSError as e:
+        if "Read-only file system" in str(e) or e.errno == 30:
+            raise HTTPException(
+                status_code=400,
+                detail="File uploads are not supported on Vercel's read-only serverless hosting. "
+                       "Please run the portfolio application locally to upload files, or use external hotlinks."
+            )
+        raise HTTPException(status_code=500, detail=f"Failed to save file due to OS error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+
 
 
 

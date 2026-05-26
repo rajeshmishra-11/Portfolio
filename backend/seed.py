@@ -102,7 +102,7 @@ def seed_database():
             tags=["React", "Vite", "CSS", "EmailJS", "GitHub Pages"],
             github="https://github.com/rajeshmishra-11/Portfolio",
             live=None,
-            featured=False,
+            featured=True,
             color="#22c55e",
             accentColor="rgba(34, 197, 94, 0.1)",
             order=4

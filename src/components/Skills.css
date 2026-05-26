@@ -1,4 +1,4 @@
-.skills { background: var(--bg-primary); }
+.skills { background: var(--bg-primary); overflow: hidden; }
 
 /* ===== TOP ROW ===== */
 .skills__top {
@@ -102,4 +102,18 @@
 }
 @media (max-width: 480px) {
   .skills__categories { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 400px) {
+  .skills__bars, .skills__principles { padding: 16px; }
+  .principle-tag { padding: 8px 10px; font-size: 0.8rem; flex-wrap: wrap; }
+  .tech-badge { padding: 8px 10px; }
+}
+
+@media (max-width: 320px) {
+  .skills__category { padding: 12px; }
+}
+
+@media (max-width: 250px) {
+  .skills__bars, .skills__principles { padding: 8px; }
 }

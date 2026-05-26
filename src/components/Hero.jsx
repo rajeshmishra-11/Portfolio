@@ -35,8 +35,9 @@ export default function Hero({ data }) {
     let particles = []
 
     const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      const parent = canvas.parentElement
+      canvas.width = parent ? parent.offsetWidth : window.innerWidth
+      canvas.height = parent ? parent.offsetHeight : window.innerHeight
     }
     resize()
     window.addEventListener('resize', resize)

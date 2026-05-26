@@ -9,7 +9,8 @@ import './Navbar.css'
 
 export default function Navbar({ data }) {
   const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)   // controls slide-in animation class
+  const [menuVisible, setMenuVisible] = useState(false) // controls DOM presence
   const [showExperience, setShowExperience] = useState(false)
   const [showProjects, setShowProjects] = useState(true)
   const { theme, toggle } = useTheme()
@@ -17,6 +18,20 @@ export default function Navbar({ data }) {
   const navigate = useNavigate()
 
   const [imageTimestamp, setImageTimestamp] = useState(localStorage.getItem('profile_img_ts') || '1')
+
+  // Open: mount element first, then trigger slide-in animation next frame
+  const openMenu = () => {
+    setMenuVisible(true)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setMenuOpen(true))
+    })
+  }
+
+  // Close: slide out first, then unmount from DOM after animation completes
+  const closeMenu = () => {
+    setMenuOpen(false)
+    setTimeout(() => setMenuVisible(false), 310)
+  }
 
   useEffect(() => {
     const handleUpdate = () => {
@@ -57,7 +72,7 @@ export default function Navbar({ data }) {
   const isHome = location.pathname === '/'
 
   const handleNavClick = (to) => {
-    setMenuOpen(false)
+    closeMenu()
     if (!isHome) {
       navigate('/')
       setTimeout(() => {
@@ -86,55 +101,75 @@ export default function Navbar({ data }) {
           </RouterLink>
         )}
 
-        <ul className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`}>
-          {navLinks.map((link) => (
-            <li key={link.to}>
+        {/* Mobile backdrop overlay — only in DOM when menu is visible */}
+        {menuVisible && (
+          <div
+            className={`navbar__overlay${menuOpen ? ' navbar__overlay--visible' : ''}`}
+            onClick={closeMenu}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Mobile drawer — only mounted in DOM when visible, removed after close animation */}
+        {menuVisible && (
+          <ul className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`}>
+            {/* Close button at top-right of the mobile drawer */}
+            <button
+              className="navbar__menu-close"
+              onClick={closeMenu}
+              aria-label="Close menu"
+            >
+              <CloseIcon size={18} />
+            </button>
+            {navLinks.map((link) => (
+              <li key={link.to}>
+                {isHome ? (
+                  <Link
+                    to={link.to}
+                    smooth
+                    duration={500}
+                    spy
+                    offset={-80}
+                    activeClass="navbar__link--active"
+                    className="navbar__link"
+                    onClick={closeMenu}
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    href={`/#${link.to}`}
+                    className="navbar__link"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleNavClick(link.to)
+                    }}
+                  >
+                    {link.label}
+                  </a>
+                )}
+              </li>
+            ))}
+            <li>
               {isHome ? (
-                <Link
-                  to={link.to}
-                  smooth
-                  duration={500}
-                  spy
-                  offset={-80}
-                  activeClass="navbar__link--active"
-                  className="navbar__link"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.label}
+                <Link to="contact" smooth duration={500} className="btn btn-primary navbar__cta" onClick={closeMenu}>
+                  Hire Me
                 </Link>
               ) : (
                 <a
-                  href={`/#${link.to}`}
-                  className="navbar__link"
+                  href="/#contact"
+                  className="btn btn-primary navbar__cta"
                   onClick={(e) => {
                     e.preventDefault()
-                    handleNavClick(link.to)
+                    handleNavClick('contact')
                   }}
                 >
-                  {link.label}
+                  Hire Me
                 </a>
               )}
             </li>
-          ))}
-          <li>
-            {isHome ? (
-              <Link to="contact" smooth duration={500} className="btn btn-primary navbar__cta" onClick={() => setMenuOpen(false)}>
-                Hire Me
-              </Link>
-            ) : (
-              <a
-                href="/#contact"
-                className="btn btn-primary navbar__cta"
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleNavClick('contact')
-                }}
-              >
-                Hire Me
-              </a>
-            )}
-          </li>
-        </ul>
+          </ul>
+        )}
 
         <div className="navbar__right">
           {/* Theme Toggle — shows Moon in light mode, Sun in dark mode */}
@@ -147,8 +182,8 @@ export default function Navbar({ data }) {
             {theme === 'light' ? <FiMoon size={20} /> : <FiSun size={20} />}
           </button>
 
-          <button className="navbar__toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
-            {menuOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
+          <button className="navbar__toggle" onClick={() => menuVisible ? closeMenu() : openMenu()} aria-label="Toggle menu">
+            {menuVisible ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
           </button>
         </div>
       </div>

@@ -397,6 +397,30 @@ def login_json(req: LoginRequest, db: Session = Depends(get_db)):
     
     return {"status": "otp_required", "username": req.username}
 
+@app.post("/api/auth/resend-otp")
+def resend_otp(req: LoginRequest, db: Session = Depends(get_db)):
+    """Re-generates and re-sends the OTP for a valid username/password session (no lockout on resend)."""
+    user = db.query(User).filter(User.username == req.username).first()
+    if not user or not verify_password(req.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials. Cannot resend OTP.",
+        )
+
+    # Generate a fresh 6-digit OTP and overwrite any existing session
+    otp_code = f"{random.randint(100000, 999999)}"
+    active_otps[req.username] = {
+        "otp": otp_code,
+        "expires_at": time.time() + 300,  # 5 minutes
+        "attempts": 0,
+    }
+
+    admin_email = "rajeshmishra847410@gmail.com"
+    send_otp_email(admin_email, req.username, otp_code)
+
+    return {"status": "otp_resent", "username": req.username}
+
+
 @app.post("/api/auth/verify-otp", response_model=Token)
 def verify_otp(req: VerifyOTPRequest, db: Session = Depends(get_db)):
     """Verifies the 6-digit OTP code and returns the access token. Locks out after 3 incorrect attempts."""

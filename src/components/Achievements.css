@@ -1,4 +1,4 @@
-.achievements { background: var(--bg-secondary); }
+.achievements { background: var(--bg-secondary); overflow: hidden; }
 
 .achievements__grid {
   display: grid;

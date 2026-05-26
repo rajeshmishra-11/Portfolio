@@ -20,6 +20,8 @@ export default function AdminDashboard() {
   const [otpError, setOtpError] = useState('')
   const [otpAttempts, setOtpAttempts] = useState(0)
   const [verificationLoading, setVerificationLoading] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [resendSuccess, setResendSuccess] = useState(false)
 
   // Dashboard view
   const [activeTab, setActiveTab] = useState('projects')
@@ -232,6 +234,33 @@ export default function AdminDashboard() {
       setOtpError('Connection to server failed')
     } finally {
       setVerificationLoading(false)
+    }
+  }
+
+  // Handle Resend OTP
+  const handleResendOtp = async () => {
+    setResendLoading(true)
+    setResendSuccess(false)
+    setOtpError('')
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      if (res.ok) {
+        setResendSuccess(true)
+        setOtpCode('')
+        setOtpAttempts(0)
+        setTimeout(() => setResendSuccess(false), 4000)
+      } else {
+        const err = await res.json()
+        setOtpError(err.detail || 'Failed to resend OTP. Please go back and log in again.')
+      }
+    } catch {
+      setOtpError('Connection to server failed')
+    } finally {
+      setResendLoading(false)
     }
   }
 
@@ -688,18 +717,19 @@ export default function AdminDashboard() {
                   <button type="submit" className="btn btn-primary admin-login__btn" disabled={verificationLoading}>
                     {verificationLoading ? 'Verifying...' : 'Verify & Enter'} <FiCheckCircle size={16} />
                   </button>
+                  {resendSuccess && (
+                    <p style={{ fontSize: '0.82rem', color: '#22c55e', textAlign: 'center', marginTop: 10 }}>
+                      ✅ New code sent! Check your inbox (and spam).
+                    </p>
+                  )}
                   <button 
                     type="button" 
                     className="btn btn-outline" 
                     style={{ width: '100%', marginTop: 12, justifyContent: 'center' }}
-                    onClick={() => {
-                      setOtpRequired(false)
-                      setOtpCode('')
-                      setOtpError('')
-                      setOtpAttempts(0)
-                    }}
+                    onClick={handleResendOtp}
+                    disabled={resendLoading}
                   >
-                    Back to Login
+                    {resendLoading ? 'Sending...' : '🔁 Resend OTP'}
                   </button>
                 </form>
               </>

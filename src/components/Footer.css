@@ -31,3 +31,10 @@
   color: var(--text-muted); transition: var(--transition);
 }
 .footer__social:hover { color: var(--primary-light); border-color: var(--primary); background: rgba(124,58,237,0.1); }
+
+@media (max-width: 480px) {
+  .footer__inner { justify-content: center; text-align: center; }
+  .footer__logo { justify-content: center; width: 100%; }
+  .footer__copy { justify-content: center; width: 100%; }
+  .footer__socials { justify-content: center; width: 100%; }
+}

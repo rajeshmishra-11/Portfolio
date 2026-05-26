@@ -10,7 +10,7 @@
 
 /* Image Column */
 .about__image-col { display: flex; justify-content: center; }
-.about__image-wrap { position: relative; width: 280px; height: 280px; }
+.about__image-wrap { position: relative; width: 280px; max-width: 100%; height: auto; aspect-ratio: 1 / 1; }
 .about__image-blob {
   position: absolute; inset: -20px; border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   background: var(--gradient-hero); opacity: 0.2; animation: morph 8s ease infinite;
@@ -94,4 +94,8 @@
 }
 @media (max-width: 480px) {
   .about__stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 320px) {
+  .about__stats { grid-template-columns: 1fr; gap: 12px; }
+  .about__stat { padding: 16px 12px; }
 }

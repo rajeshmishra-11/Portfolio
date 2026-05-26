@@ -1,4 +1,4 @@
-.certificates { background: var(--bg-primary); }
+.certificates { background: var(--bg-primary); overflow: hidden; }
 
 /* ===== GRID ===== */
 .certificates__grid {
@@ -162,4 +162,12 @@
   .cert-modal__viewer { min-height: auto; aspect-ratio: 1 / 1.1; }
   .cert-modal__iframe { min-height: auto; height: 100%; }
   .cert-modal__img { min-height: auto; max-height: 50vh; }
+}
+
+@media (max-width: 350px) {
+  .cert-card { padding: 12px; gap: 10px; }
+  .cert-card__icon-wrap { width: 40px; height: 40px; }
+  .cert-card__inner { gap: 10px; }
+  .cert-card__title { font-size: 0.9rem; }
+  .cert-card__issuer { font-size: 0.75rem; }
 }

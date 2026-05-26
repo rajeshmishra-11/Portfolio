@@ -16,7 +16,7 @@ export async function fetchPortfolioData(force = false) {
       const controller = new AbortController()
       const id = setTimeout(() => controller.abort(), 6000) // 6.0 seconds timeout to support Vercel cold starts
 
-      const res = await fetch(API_URL, { signal: controller.signal })
+      const res = await fetch(`${API_URL}?t=${Date.now()}`, { signal: controller.signal })
       clearTimeout(id)
 
       if (res.ok) {

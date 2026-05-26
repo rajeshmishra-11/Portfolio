@@ -101,6 +101,56 @@ export default function Navbar({ data }) {
           </RouterLink>
         )}
 
+        {/* Desktop navigation links */}
+        <ul className="navbar__links-desktop">
+          {navLinks.map((link) => (
+            <li key={link.to}>
+              {isHome ? (
+                <Link
+                  to={link.to}
+                  smooth
+                  duration={500}
+                  spy
+                  offset={-80}
+                  activeClass="navbar__link--active"
+                  className="navbar__link"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  href={`/#${link.to}`}
+                  className="navbar__link"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavClick(link.to)
+                  }}
+                >
+                  {link.label}
+                </a>
+              )}
+            </li>
+          ))}
+          <li>
+            {isHome ? (
+              <Link to="contact" smooth duration={500} className="btn btn-primary navbar__cta">
+                Hire Me
+              </Link>
+            ) : (
+              <a
+                href="/#contact"
+                className="btn btn-primary navbar__cta"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavClick('contact')
+                }}
+              >
+                Hire Me
+              </a>
+            )}
+          </li>
+        </ul>
+
         {/* Mobile backdrop overlay — only in DOM when menu is visible */}
         {menuVisible && (
           <div

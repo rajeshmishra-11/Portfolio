@@ -29,8 +29,9 @@
 }
 .navbar__logo:hover .navbar__logo-img { transform: scale(1.1); border-color: var(--secondary); }
 
-.navbar__links {
+.navbar__links, .navbar__links-desktop {
   display: flex; align-items: center; gap: 4px;
+  list-style: none;
 }
 .navbar__link {
   padding: 8px 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 500;
@@ -71,6 +72,7 @@
 
 @media (max-width: 900px) {
   .navbar__toggle { display: flex; }
+  .navbar__links-desktop { display: none; }
   .navbar__links {
     position: fixed; top: 0; right: 0; bottom: 0;
     width: 280px; flex-direction: column; align-items: flex-start; gap: 4px;
@@ -127,6 +129,7 @@
 
 /* Hide close button on desktop */
 @media (min-width: 901px) {
+  .navbar__links { display: none; }
   .navbar__menu-close { display: none; }
   .navbar__overlay { display: none; }
 }

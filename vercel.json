@@ -18,5 +18,11 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/portfolio",
+      "schedule": "0 0 */3 * *"
+    }
   ]
 }
